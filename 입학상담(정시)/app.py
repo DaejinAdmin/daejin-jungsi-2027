@@ -598,7 +598,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력
+# 7. 결과 출력 (50:50 균등 비율 적용)
 # ==================================================
 result = st.session_state.result
 
@@ -617,7 +617,8 @@ if result is None:
 
 history = build_history(record) if record is not None and data_scale else pd.DataFrame()
 
-result_col, comparison_col = st.columns([1, 1.5], gap="large")
+# 03, 04번 영역 비율 50:50 균등 정렬
+result_col, comparison_col = st.columns([1, 1], gap="large")
 
 with result_col:
     with st.container(border=True):
@@ -747,8 +748,11 @@ with comparison_col:
             else:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
+# ==================================================
+# 8. 결과 출력 (05, 06번 영역 비율 50:50 균등 정렬)
+# ==================================================
 if not history.empty:
-    chart_col, table_col = st.columns([1, 1.5], gap="large")
+    chart_col, table_col = st.columns([1, 1], gap="large")
 
     with chart_col:
         with st.container(border=True):
@@ -924,7 +928,7 @@ if not history.empty:
             )
 
 # ==================================================
-# 8. 모집단위 추천 및 모집단위 비교
+# 9. 모집단위 추천 및 모집단위 비교
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
