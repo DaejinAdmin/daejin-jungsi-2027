@@ -261,8 +261,7 @@ with head_c2:
     st.markdown(
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
-        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
-        """,
+        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>""",
         unsafe_allow_html=True,
     )
 
@@ -419,8 +418,7 @@ with comparison_col:
                 gap_table = pd.DataFrame({
                     "비교 기준": ["2026 최고점", "2026 평균점", "2026 최저점"],
                     "전년도 점수(100점)": [f"{v:,.2f}" for v in (max_score, avg_score, cut_score)],
-                    "내 점수와의 차이(100점)": [gap_text(v) for v in (max_score, avg_score, cut_score)],
-                    "내 점수와의 차이(1,000점)": [gap_text(v, 10) for v in (max_score, avg_score, cut_score)],
+                    "내 점수와의 차이": [gap_text(v) for v in (max_score, avg_score, cut_score)],
                 })
 
                 def color_gap(val):
@@ -619,11 +617,13 @@ if not history.empty:
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
-                st.caption(
+                st.markdown(
+                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12px;line-height:1.6;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span>　"
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span>　"
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span>　"
-                    "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>",
+                    "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
+                    "</div>",
                     unsafe_allow_html=True
                 )
 
