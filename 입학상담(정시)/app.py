@@ -67,7 +67,11 @@ st.markdown("""
     .step { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--primary)); color: #FFFFFF; font-size: 16px; font-weight: 900; flex-shrink: 0; box-shadow: 0 3px 8px rgba(8, 32, 112, 0.25); }
     .subject-title { font-size: 16px; color: var(--navy); font-weight: 850; border-left: 4px solid var(--primary); padding-left: 12px; margin: 4px 0 16px; }
 
-    .rule-strip { display: flex; gap: 14px; flex-wrap: wrap; margin: 26px 0; }
+    /* 누락되었던 flex: 1; 속성 복구 및 중복 코드 병합 */
+    .rule-strip { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 22px; }
+    .rule-item { flex: 1; min-width: 190px; padding: 16px 18px; border-radius: 12px; font-size: 15.5px; color: var(--muted); line-height: 1.6; box-shadow: none; background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary); }
+    .rule-item strong { font-size: 18px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
+
     .score-hero { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%); border-radius: 20px; padding: 30px; color: #FFFFFF; margin-bottom: 20px; box-shadow: 0 12px 24px rgba(8, 32, 112, 0.22); }
     .score-hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%); }
     .score-label { font-size: 15.5px; font-weight: 700; color: #C3CEEA; }
@@ -92,16 +96,6 @@ st.markdown("""
     .step { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
     .subject-title { font-size: 15px; margin: 3px 0 10px; padding-left: 10px; }
     
-    /* 1. 우수영역 규정 박스 및 폰트 강제 확대 */
-    .rule-strip { gap: 12px; margin: 18px 0 22px; }
-    .rule-item { min-width: 190px; padding: 16px 18px; border-radius: 12px; font-size: 15.5px; color: var(--muted); line-height: 1.6; box-shadow: none; background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary); }
-    .rule-item strong { font-size: 18px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
-    
-    .score-hero { border-radius: 16px; padding: clamp(20px, 2.2vw, 28px); margin-bottom: 14px; box-shadow: 0 7px 18px rgba(8, 32, 112, 0.16); }
-    .score-number { font-size: clamp(38px, 4vw, 58px); }
-    .score-footer { font-size: 13px; padding-top: 12px; }
-    .status { border-radius: 11px; padding: 13px 15px; font-size: 15px; }
-    .empty-state { padding: 34px 18px; border-width: 1px; border-radius: 14px; }
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
     @media (max-width: 900px) {
@@ -254,7 +248,6 @@ def build_history(record):
 # ==================================================
 head_c1, head_c2 = st.columns([0.8, 9.2])
 with head_c1:
-    # 2. 서버 절대경로(BASE_DIR) 매핑을 통한 로고 추적 강제화
     logo_png = BASE_DIR / "logo.png"
     logo_jpg = BASE_DIR / "logo.jpg"
     if logo_png.exists(): show_logo(str(logo_png))
