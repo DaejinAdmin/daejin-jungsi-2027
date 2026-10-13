@@ -249,8 +249,7 @@ with head_c2:
     st.markdown(
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
-        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
-        """,
+        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div> """,
         unsafe_allow_html=True,
     )
 
