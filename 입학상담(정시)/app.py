@@ -98,7 +98,9 @@ st.markdown("""
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
     [data-testid="stWidgetLabel"] { min-height: 1.25rem; }
     
-    [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    /* 표(DataFrame) 사이즈 균형 정렬 및 둥근 모서리 일체화 */
+    [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #FFFFFF; width: 100% !important; }
+    [data-testid="stDataFrame"] div[data-testid="stTable"] { width: 100%; }
     [data-testid="stAlert"] { border-radius: 10px; }
 
     @media (max-width: 900px) {
