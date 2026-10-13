@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 
 # ==================================================
-# 1. 기본 설정 및 상수 데이터 (온라인 클라우드 최적화)
+# 1. 기본 설정 및 상수 데이터
 # ==================================================
 st.set_page_config(page_title="2027학년도 대진대학교 정시 입학상담", page_icon="🎓", layout="wide", initial_sidebar_state="collapsed")
 
@@ -67,7 +67,6 @@ st.markdown("""
     .step { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--primary)); color: #FFFFFF; font-size: 16px; font-weight: 900; flex-shrink: 0; box-shadow: 0 3px 8px rgba(8, 32, 112, 0.25); }
     .subject-title { font-size: 16px; color: var(--navy); font-weight: 850; border-left: 4px solid var(--primary); padding-left: 12px; margin: 4px 0 16px; }
 
-    /* 누락되었던 flex: 1; 속성 복구 및 중복 코드 병합 */
     .rule-strip { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 22px; }
     .rule-item { flex: 1; min-width: 190px; padding: 16px 18px; border-radius: 12px; font-size: 15.5px; color: var(--muted); line-height: 1.6; box-shadow: none; background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary); }
     .rule-item strong { font-size: 18px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
@@ -98,11 +97,16 @@ st.markdown("""
     
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
+
+    /* [튜닝 포인트 1] 과목 입력 영역 세로 구분선 부여 */
+    .col-divider { border-right: 1px solid var(--line); padding-right: 15px; }
+    
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
         .score-hero { padding: 20px; }
         .section-title { font-size: 18px; }
+        .col-divider { border-right: none; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 15px; margin-bottom: 15px; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -244,7 +248,7 @@ def build_history(record):
     return pd.DataFrame(rows)
 
 # ==================================================
-# 6. 헤더 및 입력 영역 (온라인 로고 절대경로 고정)
+# 6. 헤더 및 입력 영역
 # ==================================================
 head_c1, head_c2 = st.columns([0.8, 9.2])
 with head_c1:
@@ -257,7 +261,6 @@ with head_c2:
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
         <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
-        <div class="page-subtitle">수능 성적 환산 · 최근 3개년 입시 결과 비교</div>
         """,
         unsafe_allow_html=True,
     )
@@ -279,7 +282,7 @@ with st.container(border=True):
     dept_col, info_col = st.columns([2, 1])
     with dept_col: selected_dept = st.selectbox("모집단위", departments, key="selected_dept", on_change=invalidate_result)
     with info_col:
-        st.info("이공계 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "일반계열 · 별도 가산점 없음")
+        st.info("이공계열 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "일반계열 · 별도 가산점 없음")
 
     record = None
     if not db.empty:
@@ -294,18 +297,30 @@ with st.container(border=True):
     with reset_col: st.button("입력 초기화", on_click=reset_inputs, use_container_width=True)
 
     c1, c2, c3, c4 = st.columns(4)
-    with c1: subject_title("국어"); kor_score = number_input("국어 백분위", "kor")
-    with c2: subject_title("수학"); math_score = number_input("수학 백분위", "math"); math_subj = st.selectbox("수학 선택과목", ["확률과 통계", "미적분", "기하"], key="math_subj", on_change=invalidate_result)
-    with c3: subject_title("영어"); eng_grade = st.selectbox("영어 등급", ["미선택"] + list(range(1, 10)), key="eng_grade", on_change=invalidate_result)
-    with c4: subject_title("한국사"); hist_grade = st.selectbox("한국사 등급", ["미선택"] + list(range(1, 10)), key="hist_grade", on_change=invalidate_result)
+    with c1: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
+        subject_title("국어"); kor_score = number_input("국어 백분위", "kor")
+        st.markdown('</div>', unsafe_allow_html=True)
+    with c2: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
+        subject_title("수학"); math_score = number_input("수학 백분위", "math"); math_subj = st.selectbox("수학 선택과목", ["확률과 통계", "미적분", "기하"], key="math_subj", on_change=invalidate_result)
+        st.markdown('</div>', unsafe_allow_html=True)
+    with c3: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
+        subject_title("영어"); eng_grade = st.selectbox("영어 등급", ["미선택"] + list(range(1, 10)), key="eng_grade", on_change=invalidate_result)
+        st.markdown('</div>', unsafe_allow_html=True)
+    with c4: 
+        subject_title("한국사"); hist_grade = st.selectbox("한국사 등급", ["미선택"] + list(range(1, 10)), key="hist_grade", on_change=invalidate_result)
 
     st.divider()
     iq1, iq2 = st.columns(2)
     with iq1:
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("탐구 01")
         sc1, sc2 = st.columns([1.4, 1])
         with sc1: inq1_subj = st.selectbox("탐구 1 과목", INQUIRY_SUBJECTS, key="inq1_subj", on_change=invalidate_result)
         with sc2: inq1_score = number_input("탐구 1 백분위", "inq1")
+        st.markdown('</div>', unsafe_allow_html=True)
     with iq2:
         subject_title("탐구 02")
         sc3, sc4 = st.columns([1.4, 1])
@@ -446,23 +461,34 @@ if not history.empty:
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
             if c_data[["최고", "평균", "최저"]].notna().any().any():
 
-                base = alt.Chart(c_data).encode(y=alt.Y("연도:N", title=None, sort=["2026", "2025", "2024"], axis=alt.Axis(labelAngle=0, labelFontSize=14, labelFontWeight="bold")))
-
-                range_bar = base.mark_bar(size=38, color="#C3CEEA", cornerRadius=6).encode(
-                    x=alt.X("최저:Q", scale=alt.Scale(zero=False, padding=20), title="환산점수 (100점 기준)", axis=alt.Axis(titlePadding=15)),
+                # [튜닝 포인트 2] 차트 디자인 전면 개편 (세련된 선형 디자인)
+                base = alt.Chart(c_data).encode(y=alt.Y("연도:N", title=None, sort=["2026", "2025", "2024"], axis=alt.Axis(labelAngle=0, labelFontSize=14, labelFontWeight="bold", grid=True)))
+                
+                # 1) 가느다란 점수 범위 선 (Rule)
+                range_rule = base.mark_rule(color="#D8E0E8", size=4).encode(
+                    x=alt.X("최저:Q", scale=alt.Scale(zero=False, padding=20), title="환산점수 (100점 기준)", axis=alt.Axis(titlePadding=15, grid=False)),
                     x2="최고:Q",
                     tooltip=[alt.Tooltip("연도:N", title="학년도"), alt.Tooltip("최고:Q", format=".2f", title="합격자 최고점"), alt.Tooltip("평균:Q", format=".2f", title="합격자 평균점"), alt.Tooltip("최저:Q", format=".2f", title="합격자 최저점(컷)")]
                 )
+                
+                # 2) 최고점 포인트 (동그라미)
+                max_point = base.mark_point(color="#1D3FA0", size=80, opacity=1, filled=True).encode(x="최고:Q")
+                
+                # 3) 최저점 포인트 (동그라미)
+                min_point = base.mark_point(color="#1D3FA0", size=80, opacity=1, filled=True).encode(x="최저:Q")
 
-                avg_tick = base.mark_tick(color="#082070", thickness=4.5, size=46).encode(x="평균:Q")
+                # 4) 평균점 포인트 (마름모형 틱)
+                avg_point = base.mark_point(color="#051550", shape="diamond", size=150, opacity=1, filled=True).encode(x="평균:Q")
 
-                max_txt = base.mark_text(align="left", dx=6, fontSize=12, color="#1B2440", fontWeight="bold").encode(x="최고:Q", text=alt.Text("최고:Q", format=".2f"))
-                min_txt = base.mark_text(align="right", dx=-6, fontSize=12, color="#1B2440", fontWeight="bold").encode(x="최저:Q", text=alt.Text("최저:Q", format=".2f"))
+                # 5) 텍스트 라벨링
+                max_txt = base.mark_text(align="left", dx=10, fontSize=12, color="#1B2440", fontWeight="bold").encode(x="최고:Q", text=alt.Text("최고:Q", format=".2f"))
+                min_txt = base.mark_text(align="right", dx=-10, fontSize=12, color="#1B2440", fontWeight="bold").encode(x="최저:Q", text=alt.Text("최저:Q", format=".2f"))
 
+                # 6) 내 점수 붉은 점선
                 my_line = alt.Chart(pd.DataFrame({"내 점수": [result["score"]]})).mark_rule(color="#E11D48", strokeWidth=2.5, strokeDash=[6, 4]).encode(x="내 점수:Q", tooltip=[alt.Tooltip("내 점수:Q", title="현재 내 환산점수", format=".2f")])
 
-                st.altair_chart(alt.layer(range_bar, avg_tick, max_txt, min_txt, my_line).properties(height=350).configure_view(stroke=None).configure_axis(gridColor="#EEF1FA", domain=False), use_container_width=True)
-                st.caption("※ 네이비 실선: 해당 연도 평균점 &nbsp;&nbsp;|&nbsp;&nbsp; <span style='color:#E11D48; font-weight:bold;'>레드 점선: 현재 내 점수</span>", unsafe_allow_html=True)
+                st.altair_chart(alt.layer(range_rule, min_point, max_point, avg_point, max_txt, min_txt, my_line).properties(height=350).configure_view(stroke=None).configure_axis(domainColor="#DDE3F0", tickColor="#DDE3F0"), use_container_width=True)
+                st.caption("※ 파란 둥근점: 최고/최저점 &nbsp;&nbsp;|&nbsp;&nbsp; 네이비 마름모: 평균점 &nbsp;&nbsp;|&nbsp;&nbsp; <span style='color:#E11D48; font-weight:bold;'>레드 점선: 내 점수</span>", unsafe_allow_html=True)
 
     with table_col:
         with st.container(border=True):
