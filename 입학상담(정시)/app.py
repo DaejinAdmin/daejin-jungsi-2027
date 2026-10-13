@@ -98,15 +98,17 @@ st.markdown("""
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
 
-    /* [튜닝 포인트 1] 과목 입력 영역 세로 구분선 부여 */
-    .col-divider { border-right: 1px solid var(--line); padding-right: 15px; }
+    /* [튜닝 포인트 1] Streamlit 네이티브 컬럼을 직접 추적하여 세로 구분선(Border) 강제 주입 */
+    div[data-testid="column"]:has(.subject-title) { border-right: 1.5px solid #D0D7E5; padding-right: 15px; }
+    div[data-testid="column"]:has(.subject-title):last-child { border-right: none; padding-right: 0; }
     
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
         .score-hero { padding: 20px; }
         .section-title { font-size: 18px; }
-        .col-divider { border-right: none; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 15px; margin-bottom: 15px; }
+        div[data-testid="column"]:has(.subject-title) { border-right: none; padding-right: 0; border-bottom: 1.5px solid #D0D7E5; padding-bottom: 15px; margin-bottom: 15px; }
+        div[data-testid="column"]:has(.subject-title):last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -298,29 +300,21 @@ with st.container(border=True):
 
     c1, c2, c3, c4 = st.columns(4)
     with c1: 
-        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("국어"); kor_score = number_input("국어 백분위", "kor")
-        st.markdown('</div>', unsafe_allow_html=True)
     with c2: 
-        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("수학"); math_score = number_input("수학 백분위", "math"); math_subj = st.selectbox("수학 선택과목", ["확률과 통계", "미적분", "기하"], key="math_subj", on_change=invalidate_result)
-        st.markdown('</div>', unsafe_allow_html=True)
     with c3: 
-        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("영어"); eng_grade = st.selectbox("영어 등급", ["미선택"] + list(range(1, 10)), key="eng_grade", on_change=invalidate_result)
-        st.markdown('</div>', unsafe_allow_html=True)
     with c4: 
         subject_title("한국사"); hist_grade = st.selectbox("한국사 등급", ["미선택"] + list(range(1, 10)), key="hist_grade", on_change=invalidate_result)
 
     st.divider()
     iq1, iq2 = st.columns(2)
     with iq1:
-        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("탐구 01")
         sc1, sc2 = st.columns([1.4, 1])
         with sc1: inq1_subj = st.selectbox("탐구 1 과목", INQUIRY_SUBJECTS, key="inq1_subj", on_change=invalidate_result)
         with sc2: inq1_score = number_input("탐구 1 백분위", "inq1")
-        st.markdown('</div>', unsafe_allow_html=True)
     with iq2:
         subject_title("탐구 02")
         sc3, sc4 = st.columns([1.4, 1])
@@ -461,7 +455,6 @@ if not history.empty:
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
             if c_data[["최고", "평균", "최저"]].notna().any().any():
 
-                # 차트 개선: 여백 확보, 정보 계층화, 라벨 잘림 방지
                 chart_values = [
                     value
                     for value in c_data[["최고", "평균", "최저"]].to_numpy().ravel().tolist()
@@ -519,7 +512,6 @@ if not history.empty:
 
                 base = alt.Chart(chart_data).encode(y=y_encoding)
 
-                # 최고점~최저점의 범위
                 range_rule = base.mark_rule(
                     color="#CBD5E5",
                     strokeWidth=5,
@@ -554,7 +546,6 @@ if not history.empty:
                     ]
                 )
 
-                # 최저점·최고점: 서로 다른 색으로 구분
                 min_point = base.mark_point(
                     filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
                 ).encode(
@@ -570,7 +561,6 @@ if not history.empty:
                              alt.Tooltip("최고:Q", format=".2f", title="최고점")]
                 )
 
-                # 평균점: 네이비 마름모
                 avg_point = base.mark_point(
                     filled=True, color="#14264D", shape="diamond", size=145,
                     stroke="#FFFFFF", strokeWidth=1
@@ -580,7 +570,6 @@ if not history.empty:
                              alt.Tooltip("평균:Q", format=".2f", title="평균점")]
                 )
 
-                # 끝점 점수 라벨
                 max_txt = base.mark_text(
                     align="left", dx=8, dy=-10, fontSize=11,
                     color="#2447A8", fontWeight=700
@@ -596,7 +585,6 @@ if not history.empty:
                     text=alt.Text("최저:Q", format=".2f")
                 )
 
-                # 현재 내 점수: 붉은 점선 + 상단 라벨
                 my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
                 my_line = alt.Chart(my_score_df).mark_rule(
                     color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
@@ -608,6 +596,7 @@ if not history.empty:
                     ),
                     tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")]
                 )
+                
                 my_label = alt.Chart(
                     pd.DataFrame({"내 점수": [float(result["score"])], "표시": [f'내 점수 {float(result["score"]):.2f}']})
                 ).mark_text(
@@ -633,11 +622,15 @@ if not history.empty:
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
-                st.caption(
-                    "<span style='color:#3157C8;font-weight:700;'>● 최고점</span>　"
-                    "<span style='color:#087F75;font-weight:700;'>● 최저점</span>　"
-                    "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span>　"
-                    "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>",
+                
+                # [튜닝 포인트 2] 좌측 정렬되던 범례를 강제로 정중앙 배치 (HTML/CSS 활용)
+                st.markdown(
+                    "<div style='text-align: center; margin-top: 15px; font-size: 13.5px;'>"
+                    "<span style='color:#3157C8;font-weight:800;'>● 최고점</span> &nbsp;&nbsp;&nbsp; "
+                    "<span style='color:#087F75;font-weight:800;'>● 최저점</span> &nbsp;&nbsp;&nbsp; "
+                    "<span style='color:#14264D;font-weight:800;'>◆ 평균점</span> &nbsp;&nbsp;&nbsp; "
+                    "<span style='color:#E5485D;font-weight:800;'>┆ 내 점수</span>"
+                    "</div>",
                     unsafe_allow_html=True
                 )
 
