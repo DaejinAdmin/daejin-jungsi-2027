@@ -270,7 +270,7 @@ st.markdown(
     """
     <div class="rule-strip">
         <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>02 &nbsp; 60%반영과목 제외 과목 중 40%</strong>남은 국·수·영, 탐구 상위 1과목, 한국사 중 1과목</div>
+        <div class="rule-item"><strong>02 &nbsp; 60%반영과목 제외 과목 중 40%</strong>남은 국·수·영 + 탐구 상위 1과목 + 한국사</div>
         <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
     </div>
     """,
@@ -435,19 +435,10 @@ with comparison_col:
                     elif '초과' in val_str: return 'color: #1D3FA0; font-weight: 800;'
                     return ''
 
-                gap_styler = gap_table.style
-                if hasattr(gap_styler, 'map'):
-                    gap_styler = gap_styler.map(color_gap, subset=["내 점수와의 차이"])
-                else:
-                    gap_styler = gap_styler.applymap(color_gap, subset=["내 점수와의 차이"])
-                gap_styler = gap_styler.set_table_styles([
-                    {"selector": "th", "props": [("background-color", "#EEF2FA"), ("color", "#082070"), ("font-weight", "700"), ("font-size", "13px"), ("border-bottom", "1px solid #D5DDED"), ("padding", "10px 12px")]},
-                    {"selector": "td", "props": [("font-size", "13px"), ("padding", "10px 12px"), ("border-bottom", "1px solid #E8ECF4"), ("font-variant-numeric", "tabular-nums")]},
-                    {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#F8FAFE")]},
-                    {"selector": "tbody tr:hover", "props": [("background-color", "#EEF3FF")]},
-                    {"selector": "table", "props": [("border-collapse", "separate"), ("border-spacing", "0"), ("border", "1px solid #D8E0EE"), ("border-radius", "10px"), ("overflow", "hidden")]}
-                ])
-                st.dataframe(gap_styler, hide_index=True, use_container_width=True)
+                if hasattr(gap_table.style, 'map'): styled_table = gap_table.style.map(color_gap)
+                else: styled_table = gap_table.style.applymap(color_gap)
+
+                st.dataframe(styled_table, hide_index=True, use_container_width=True)
                 st.caption("※ 전년도 결과와의 단순 점수 비교이며, 합격 여부를 보장하지 않습니다.")
             elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning("2026년 최고·평균·최저 점수의 값 또는 순서가 올바르지 않아 판정 문구를 표시하지 않습니다. 원본 입시 결과 자료를 확인해 주세요.")
@@ -652,18 +643,165 @@ if not history.empty:
             table["경쟁률"] = table["경쟁률"].map(display_ratio)
             table["추가합격"] = table["추가합격"].map(display_text)
             for c in ("최고", "평균", "최저"): table[c] = table[c].map(display_number)
-            display_cols = ["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]
-            display_table = table[display_cols].copy()
-            latest_index = display_table.index[0] if not display_table.empty else None
-            def latest_year_style(row):
-                if row.name == latest_index:
-                    return ["background-color: #F0F4FF; font-weight: 700;" for _ in row]
-                return ["" for _ in row]
-            history_styler = display_table.style.apply(latest_year_style, axis=1).set_table_styles([
-                {"selector": "th", "props": [("background-color", "#EEF2FA"), ("color", "#082070"), ("font-weight", "750"), ("font-size", "13px"), ("text-align", "center"), ("padding", "11px 10px"), ("border-bottom", "1px solid #D5DDED")]},
-                {"selector": "td", "props": [("color", "#263451"), ("font-size", "13px"), ("padding", "11px 10px"), ("border-bottom", "1px solid #E8ECF4"), ("font-variant-numeric", "tabular-nums")]},
-                {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#F8FAFE")]},
-                {"selector": "tbody tr:hover", "props": [("background-color", "#EEF3FF")]},
-                {"selector": "table", "props": [("border-collapse", "separate"), ("border-spacing", "0"), ("border", "1px solid #D8E0EE"), ("border-radius", "10px"), ("overflow", "hidden")]}
-            ])
-            st.dataframe(history_styler, hide_index=True, use_container_width=True)
+            st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
+
+# ==================================================
+# 8. 모집단위 추천 및 모집단위 비교
+#    기존 환산점수/가산점 계산 함수를 재사용하며 계산 로직은 변경하지 않음
+# ==================================================
+if not db.empty and data_scale and result is not None:
+    st.divider()
+    st.markdown('<div class="section-title"><span class="step">07</span>모집단위 추천 및 비교</div>', unsafe_allow_html=True)
+    st.caption("현재 입력한 수능 성적을 각 모집단위의 기존 환산점수 산식으로 다시 계산하고, 최근 3개년 입결과 비교합니다. 참고용 분석이며 합격을 보장하거나 확률을 예측하지 않습니다.")
+
+    def make_dept_analysis(dept_name):
+        matches = db[db["모집단위명"] == dept_name]
+        if matches.empty:
+            return None
+        dept_record = matches.iloc[0]
+        dept_score = calculate_score(
+            dept_name, kor_score, math_subj, math_score, eng_grade, hist_grade,
+            inq1_subj, inq1_score, inq2_subj, inq2_score
+        )
+        dept_history = build_history(dept_record)
+        hist_by_year = {}
+        for _, hist_row in dept_history.iterrows():
+            hist_by_year[str(hist_row["연도"])] = {
+                label: to_number(hist_row.get(label)) for label in ("최고", "평균", "최저")
+            }
+        recent = hist_by_year.get("2026", {})
+        recent_avg = recent.get("평균")
+        recent_min = recent.get("최저")
+        recent_max = recent.get("최고")
+
+        if recent_avg is None or recent_min is None or recent_max is None:
+            recommendation = "자료 확인 필요"
+            rationale = "2026학년도 최고·평균·최저 점수 중 일부가 없습니다."
+            gap_to_avg = None
+            gap_to_min = None
+        else:
+            gap_to_avg = round(dept_score["score"] - recent_avg, 2)
+            gap_to_min = round(dept_score["score"] - recent_min, 2)
+            if dept_score["score"] >= recent_avg:
+                recommendation = "안정 참고"
+                rationale = f"현재 환산점수가 2026 평균보다 {gap_to_avg:+.2f}점입니다."
+            elif dept_score["score"] >= recent_min:
+                recommendation = "적정·경계 참고"
+                rationale = f"2026 최저점 이상, 평균점 미만입니다(평균 대비 {gap_to_avg:+.2f}점)."
+            else:
+                recommendation = "상향 참고"
+                rationale = f"현재 환산점수가 2026 최저점보다 {abs(gap_to_min):.2f}점 낮습니다."
+
+        return {
+            "모집단위": dept_name,
+            "현재 환산점수": dept_score["score"],
+            "분류": recommendation,
+            "2026 최고": recent_max,
+            "2026 평균": recent_avg,
+            "2026 최저": recent_min,
+            "평균 대비": gap_to_avg,
+            "최저 대비": gap_to_min,
+            "안내": rationale,
+            "연도별": hist_by_year,
+        }
+
+    analysis_by_dept = {}
+    for dept_name in departments:
+        analysis = make_dept_analysis(dept_name)
+        if analysis is not None:
+            analysis_by_dept[dept_name] = analysis
+
+    recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
+
+    with recommendation_tab:
+        st.markdown("#### 현재 점수 기준 추천 참고 목록")
+        st.caption("분류 기준: 현재 점수 ≥ 2026 평균 → 안정 참고 / 2026 최저 이상~평균 미만 → 적정·경계 참고 / 2026 최저 미만 → 상향 참고")
+        recommendation_rows = []
+        for item in analysis_by_dept.values():
+            if item["분류"] == "자료 확인 필요":
+                continue
+            recommendation_rows.append({
+                "참고 분류": item["분류"],
+                "모집단위": item["모집단위"],
+                "내 환산점수": item["현재 환산점수"],
+                "2026 평균": item["2026 평균"],
+                "평균 대비": item["평균 대비"],
+                "2026 최저": item["2026 최저"],
+                "최저 대비": item["최저 대비"],
+                "분류 근거": item["안내"],
+            })
+        if recommendation_rows:
+            rec_df = pd.DataFrame(recommendation_rows)
+            rec_order = {"안정 참고": 0, "적정·경계 참고": 1, "상향 참고": 2}
+            rec_df["_order"] = rec_df["참고 분류"].map(rec_order)
+            rec_df = rec_df.sort_values(["_order", "평균 대비"], ascending=[True, False]).drop(columns="_order")
+            st.dataframe(
+                rec_df.style.format({
+                    "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
+                    "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
+                }, na_rep="—"),
+                hide_index=True, use_container_width=True, height=420
+            )
+            st.download_button(
+                "추천 목록 CSV 다운로드",
+                data=rec_df.to_csv(index=False, encoding="utf-8-sig"),
+                file_name="대진대_모집단위_추천참고.csv",
+                mime="text/csv",
+                use_container_width=False,
+            )
+        else:
+            st.info("추천 분류에 필요한 2026학년도 입시 결과가 충분하지 않습니다.")
+
+    with comparison_tab:
+        st.markdown("#### 모집단위별 점수·입결 나란히 비교")
+        compare_options = list(analysis_by_dept.keys())
+        default_compare = [selected_dept] if selected_dept in compare_options else compare_options[:1]
+        compare_depts = st.multiselect(
+            "비교할 모집단위 선택 (최대 4개)",
+            options=compare_options,
+            default=default_compare,
+            max_selections=4,
+            key="compare_departments",
+        )
+        if compare_depts:
+            compare_rows = []
+            metrics = [
+                ("현재 환산점수", None),
+                ("2026 최고", ("2026", "최고")),
+                ("2026 평균", ("2026", "평균")),
+                ("2026 최저", ("2026", "최저")),
+                ("2025 최고", ("2025", "최고")),
+                ("2025 평균", ("2025", "평균")),
+                ("2025 최저", ("2025", "최저")),
+                ("2024 최고", ("2024", "최고")),
+                ("2024 평균", ("2024", "평균")),
+                ("2024 최저", ("2024", "최저")),
+                ("2026 평균 대비", "gap"),
+                ("참고 분류", "category"),
+            ]
+            for metric_label, metric_key in metrics:
+                row = {"비교 항목": metric_label}
+                for dept_name in compare_depts:
+                    item = analysis_by_dept[dept_name]
+                    if metric_key is None:
+                        value = item["현재 환산점수"]
+                    elif metric_key == "gap":
+                        value = item["평균 대비"]
+                    elif metric_key == "category":
+                        value = item["분류"]
+                    else:
+                        year, label = metric_key
+                        value = item["연도별"].get(year, {}).get(label)
+                    row[dept_name] = value
+                compare_rows.append(row)
+            compare_df = pd.DataFrame(compare_rows)
+            numeric_columns = [c for c in compare_df.columns if c != "비교 항목"]
+            for row_index, metric_label in compare_df["비교 항목"].items():
+                for col in numeric_columns:
+                    value = compare_df.at[row_index, col]
+                    if isinstance(value, (int, float)) and pd.notna(value):
+                        compare_df.at[row_index, col] = f"{value:+.2f}" if metric_label == "2026 평균 대비" else f"{value:.2f}"
+            st.dataframe(compare_df, hide_index=True, use_container_width=True)
+            st.caption("※ 모집단위마다 적용되는 가산점은 기존 계산 함수로 반영했습니다. 모집인원·모집군·충원 등 다른 전형 요소는 이 비교표에 포함하지 않았습니다.")
+        else:
+            st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
