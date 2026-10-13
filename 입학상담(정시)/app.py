@@ -652,7 +652,8 @@ if not history.empty:
 if not db.empty and data_scale and result is not None:
     st.divider()
     st.markdown('<div class="section-title"><span class="step">07</span>모집단위 추천 및 비교</div>', unsafe_allow_html=True)
-    
+    st.caption("현재 입력한 수능 성적을 각 모집단위의 기존 환산점수 산식으로 다시 계산하고, 최근 3개년 입결과 비교합니다. 참고용 분석이며 합격을 보장하거나 확률을 예측하지 않습니다.")
+
     def make_dept_analysis(dept_name):
         matches = db[db["모집단위명"] == dept_name]
         if matches.empty:
@@ -767,7 +768,7 @@ if not db.empty and data_scale and result is not None:
             st.info("추천 분류에 필요한 2026학년도 입시 결과가 충분하지 않습니다.")
 
     with comparison_tab:
-        st.markdown("#### 모집단위별 점수·입결 나란히 비교")
+        st.markdown("#### 모집단위별 점수·입결 비교")
         compare_options = list(analysis_by_dept.keys())
         default_compare = [selected_dept] if selected_dept in compare_options else compare_options[:1]
         compare_depts = st.multiselect(
@@ -780,25 +781,30 @@ if not db.empty and data_scale and result is not None:
         if compare_depts:
             compare_rows = []
             metrics = [
-                ("현재 환산점수", None),
-                ("2026 최고", ("2026", "최고")),
-                ("2026 평균", ("2026", "평균")),
-                ("2026 최저", ("2026", "최저")),
-                ("2025 최고", ("2025", "최고")),
-                ("2025 평균", ("2025", "평균")),
-                ("2025 최저", ("2025", "최저")),
-                ("2024 최고", ("2024", "최고")),
-                ("2024 평균", ("2024", "평균")),
-                ("2024 최저", ("2024", "최저")),
-                ("2026 평균 대비", "gap"),
-                ("분류", "category"),
+                ("현재 환산점수", None, "current"),
+                ("2026학년도", None, "year"),
+                ("　최고", ("2026", "최고"), "metric"),
+                ("　평균", ("2026", "평균"), "metric"),
+                ("　최저", ("2026", "최저"), "metric"),
+                ("2025학년도", None, "year"),
+                ("　최고", ("2025", "최고"), "metric"),
+                ("　평균", ("2025", "평균"), "metric"),
+                ("　최저", ("2025", "최저"), "metric"),
+                ("2024학년도", None, "year"),
+                ("　최고", ("2024", "최고"), "metric"),
+                ("　평균", ("2024", "평균"), "metric"),
+                ("　최저", ("2024", "최저"), "metric"),
+                ("평균 대비", "gap", "summary"),
+                ("분류", "category", "summary"),
             ]
-            for metric_label, metric_key in metrics:
+            row_types = []
+            for metric_label, metric_key, row_type in metrics:
                 row = {"비교 항목": metric_label}
+                row_types.append(row_type)
                 for dept_name in compare_depts:
                     item = analysis_by_dept[dept_name]
                     if metric_key is None:
-                        value = item["현재 환산점수"]
+                        value = item["현재 환산점수"] if row_type == "current" else ""
                     elif metric_key == "gap":
                         value = item["평균 대비"]
                     elif metric_key == "category":
@@ -814,7 +820,22 @@ if not db.empty and data_scale and result is not None:
                 for col in numeric_columns:
                     value = compare_df.at[row_index, col]
                     if isinstance(value, (int, float)) and pd.notna(value):
-                        compare_df.at[row_index, col] = f"{value:+.2f}" if metric_label == "2026 평균 대비" else f"{value:.2f}"
-            st.dataframe(compare_df, hide_index=True, use_container_width=True)
+                        compare_df.at[row_index, col] = f"{value:+.2f}" if metric_label == "평균 대비" else f"{value:.2f}"
+
+            def style_comparison_rows(row):
+                row_type = row_types[row.name]
+                if row_type == "year":
+                    return [
+                        "background-color: #E8EEF8; color: #17365D; font-weight: bold; border-top: 2px solid #9DB2D1;"
+                    ] * len(row)
+                if row_type == "current":
+                    return ["background-color: #F4F7FB; font-weight: bold;"] * len(row)
+                if row_type == "summary":
+                    return ["font-weight: bold;"] * len(row)
+                return [""] * len(row)
+
+            styled_compare_df = compare_df.style.apply(style_comparison_rows, axis=1)
+            st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
+            st.caption("※ 모집단위마다 적용되는 가산점은 기존 계산 함수로 반영했습니다. 모집인원·모집군·충원 등 다른 전형 요소는 이 비교표에 포함하지 않았습니다.")
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
