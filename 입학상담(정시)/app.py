@@ -94,7 +94,6 @@ st.markdown("""
     .section-title { gap: 10px; font-size: 20px; margin: 2px 0 14px; }
     .step { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
     .subject-title { font-size: 15px; margin: 3px 0 10px; padding-left: 10px; min-height: 23px; line-height: 1.5; box-sizing: border-box; }
-    /* 과목별 제목/위젯은 실제 Streamlit 컨테이너 흐름을 사용해 수직 정렬을 유지 */
     div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
     [data-testid="stWidgetLabel"] { min-height: 1.25rem; }
@@ -102,7 +101,6 @@ st.markdown("""
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
 
-    
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
@@ -453,7 +451,6 @@ if not history.empty:
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
             if c_data[["최고", "평균", "최저"]].notna().any().any():
 
-                # 차트 개선: 여백 확보, 정보 계층화, 라벨 잘림 방지
                 chart_values = [
                     value
                     for value in c_data[["최고", "평균", "최저"]].to_numpy().ravel().tolist()
@@ -488,30 +485,9 @@ if not history.empty:
                         gridWidth=1
                     )
                 )
-                x_encoding = alt.X(
-                    "점수:Q",
-                    title="환산점수 · 100점 기준",
-                    scale=alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False),
-                    axis=alt.Axis(
-                        titleFontSize=12,
-                        titleFontWeight=600,
-                        titleColor="#64708A",
-                        titlePadding=14,
-                        labelFontSize=11,
-                        labelColor="#64708A",
-                        tickCount=6,
-                        grid=True,
-                        gridColor="#E9EDF5",
-                        gridDash=[2, 3],
-                        domain=False,
-                        tickSize=0,
-                        format=".1f"
-                    )
-                )
 
                 base = alt.Chart(chart_data).encode(y=y_encoding)
 
-                # 최고점~최저점의 범위
                 range_rule = base.mark_rule(
                     color="#CBD5E5",
                     strokeWidth=5,
@@ -546,7 +522,6 @@ if not history.empty:
                     ]
                 )
 
-                # 최저점·최고점: 서로 다른 색으로 구분
                 min_point = base.mark_point(
                     filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
                 ).encode(
@@ -562,7 +537,6 @@ if not history.empty:
                              alt.Tooltip("최고:Q", format=".2f", title="최고점")]
                 )
 
-                # 평균점: 네이비 마름모
                 avg_point = base.mark_point(
                     filled=True, color="#14264D", shape="diamond", size=145,
                     stroke="#FFFFFF", strokeWidth=1
@@ -572,7 +546,6 @@ if not history.empty:
                              alt.Tooltip("평균:Q", format=".2f", title="평균점")]
                 )
 
-                # 끝점 점수 라벨
                 max_txt = base.mark_text(
                     align="left", dx=8, dy=-10, fontSize=11,
                     color="#2447A8", fontWeight=700
@@ -588,7 +561,6 @@ if not history.empty:
                     text=alt.Text("최저:Q", format=".2f")
                 )
 
-                # 현재 내 점수: 붉은 점선 + 상단 라벨
                 my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
                 my_line = alt.Chart(my_score_df).mark_rule(
                     color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
@@ -599,20 +571,6 @@ if not history.empty:
                         axis=None
                     ),
                     tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")]
-                )
-                my_label = alt.Chart(
-                    pd.DataFrame({"내 점수": [float(result["score"])], "표시": [f'내 점수 {float(result["score"]):.2f}']})
-                ).mark_text(
-                    align="center", baseline="bottom", dy=-8, fontSize=11,
-                    fontWeight=700, color="#D9344D"
-                ).encode(
-                    x=alt.X(
-                        "내 점수:Q",
-                        scale=alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False),
-                        axis=None
-                    ),
-                    y=alt.value(0),
-                    text="표시:N"
                 )
 
                 chart = (
@@ -627,9 +585,9 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
                 st.markdown(
                     "<div style='width:100%;text-align:center;margin-top:2px;font-size:12px;line-height:1.6;'>"
-                    "<span style='color:#3157C8;font-weight:700;'>● 최고점</span>　"
-                    "<span style='color:#087F75;font-weight:700;'>● 최저점</span>　"
-                    "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span>　"
+                    "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
+                    "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
+                    "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
                     "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
                     "</div>",
                     unsafe_allow_html=True
@@ -646,8 +604,7 @@ if not history.empty:
             st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
 
 # ==================================================
-# 8. 모집단위 추천 및 모집단위 비교
-#    기존 환산점수/가산점 계산 함수를 재사용하며 계산 로직은 변경하지 않음
+# 8. 모집단위 추천 및 모집단위 비교 (연도별 판정 결과통합)
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
@@ -664,9 +621,25 @@ if not db.empty and data_scale and result is not None:
         dept_history = build_history(dept_record)
         hist_by_year = {}
         for _, hist_row in dept_history.iterrows():
-            hist_by_year[str(hist_row["연도"])] = {
-                label: to_number(hist_row.get(label)) for label in ("최고", "평균", "최저")
+            year_str = str(hist_row["연도"])
+            mx = to_number(hist_row.get("최고"))
+            av = to_number(hist_row.get("평균"))
+            mn = to_number(hist_row.get("최저"))
+            
+            # 각 연도별 판정 로직 동적 계산
+            status = "자료 없음"
+            if av is not None and mn is not None and mx is not None:
+                if dept_score["score"] >= av:
+                    status = "안정"
+                elif dept_score["score"] >= mn:
+                    status = "적정·경계"
+                else:
+                    status = "상향"
+
+            hist_by_year[year_str] = {
+                "최고": mx, "평균": av, "최저": mn, "판정": status
             }
+
         recent = hist_by_year.get("2026", {})
         recent_avg = recent.get("평균")
         recent_min = recent.get("최저")
@@ -680,14 +653,12 @@ if not db.empty and data_scale and result is not None:
         else:
             gap_to_avg = round(dept_score["score"] - recent_avg, 2)
             gap_to_min = round(dept_score["score"] - recent_min, 2)
-            if dept_score["score"] >= recent_avg:
-                recommendation = "안정"
+            recommendation = recent.get("판정", "자료 확인 필요")
+            if recommendation == "안정":
                 rationale = f"현재 환산점수가 2026 평균보다 {gap_to_avg:+.2f}점입니다."
-            elif dept_score["score"] >= recent_min:
-                recommendation = "적정·경계"
+            elif recommendation == "적정·경계":
                 rationale = f"2026 최저점 이상, 평균점 미만입니다(평균 대비 {gap_to_avg:+.2f}점)."
             else:
-                recommendation = "상향"
                 rationale = f"현재 환산점수가 2026 최저점보다 {abs(gap_to_min):.2f}점 낮습니다."
 
         return {
@@ -735,7 +706,6 @@ if not db.empty and data_scale and result is not None:
             rec_df = rec_df.sort_values(["_order", "평균 대비"], ascending=[True, False]).drop(columns="_order")
 
             def style_recommendation_cell(value):
-                # 평균/최저보다 높은 점수 또는 안정 분류는 파란색으로 강조
                 value_text = str(value)
                 if value_text == "안정":
                     return "color: #1D4ED8; font-weight: 800;"
@@ -743,21 +713,15 @@ if not db.empty and data_scale and result is not None:
                     return "color: #B45309; font-weight: 800;"
                 if value_text == "상향":
                     return "color: #DC2626; font-weight: 800;"
-                if value_text.startswith("현재 환산점수가 2026 평균보다 +"):
-                    return "color: #1D4ED8; font-weight: 700;"
-                if "2026 최저점 이상" in value_text:
-                    return "color: #1D4ED8; font-weight: 700;"
-                if "낮습니다" in value_text:
-                    return "color: #DC2626; font-weight: 700;"
                 return ""
 
             styled_rec = rec_df.style.format({
                 "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
                 "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
-            }, na_rep="—").map(style_recommendation_cell, subset=["분류", "분류 근거"]) if hasattr(rec_df.style, "map") else rec_df.style.format({
+            }, na_rep="—").map(style_recommendation_cell, subset=["분류"]) if hasattr(rec_df.style, "map") else rec_df.style.format({
                 "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
                 "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
-            }, na_rep="—").applymap(style_recommendation_cell, subset=["분류", "분류 근거"])
+            }, na_rep="—").applymap(style_recommendation_cell, subset=["분류"])
             st.dataframe(
                 styled_rec,
                 hide_index=True, use_container_width=True, height=420
@@ -780,20 +744,18 @@ if not db.empty and data_scale and result is not None:
             compare_rows = []
             metrics = [
                 ("현재 환산점수", None, "current"),
-                ("2026학년도", None, "year"),
-                ("　최고", ("2026", "최고"), "metric"),
-                ("　평균", ("2026", "평균"), "metric"),
-                ("　최저", ("2026", "최저"), "metric"),
-                ("2025학년도", None, "year"),
-                ("　최고", ("2025", "최고"), "metric"),
-                ("　평균", ("2025", "평균"), "metric"),
-                ("　최저", ("2025", "최저"), "metric"),
-                ("2024학년도", None, "year"),
-                ("　최고", ("2024", "최고"), "metric"),
-                ("　평균", ("2024", "평균"), "metric"),
-                ("　최저", ("2024", "최저"), "metric"),
-                ("평균 대비", "gap", "summary"),
-                ("분류", "category", "summary"),
+                ("2026학년도", "2026", "year"),
+                (" 최고", ("2026", "최고"), "metric"),
+                (" 평균", ("2026", "평균"), "metric"),
+                (" 최저", ("2026", "최저"), "metric"),
+                ("2025학년도", "2025", "year"),
+                (" 최고", ("2025", "최고"), "metric"),
+                (" 평균", ("2025", "평균"), "metric"),
+                (" 최저", ("2025", "최저"), "metric"),
+                ("2024학년도", "2024", "year"),
+                (" 최고", ("2024", "최고"), "metric"),
+                (" 평균", ("2024", "평균"), "metric"),
+                (" 최저", ("2024", "최저"), "metric"),
             ]
             row_types = []
             for metric_label, metric_key, row_type in metrics:
@@ -803,22 +765,24 @@ if not db.empty and data_scale and result is not None:
                     item = analysis_by_dept[dept_name]
                     if metric_key is None:
                         value = item["현재 환산점수"] if row_type == "current" else ""
-                    elif metric_key == "gap":
-                        value = item["평균 대비"]
-                    elif metric_key == "category":
-                        value = item["분류"]
+                    elif row_type == "year":
+                        # 연도별 행 타이틀 옆에 해당 연도 판정 결과(안정/적정/상향) 결합
+                        yr_status = item["연도별"].get(metric_key, {}).get("판정", "")
+                        value = f"[{yr_status}]" if yr_status and yr_status != "자료 없음" else ""
                     else:
                         year, label = metric_key
                         value = item["연도별"].get(year, {}).get(label)
                     row[dept_name] = value
                 compare_rows.append(row)
+
             compare_df = pd.DataFrame(compare_rows)
             numeric_columns = [c for c in compare_df.columns if c != "비교 항목"]
-            for row_index, metric_label in compare_df["비교 항목"].items():
-                for col in numeric_columns:
-                    value = compare_df.at[row_index, col]
-                    if isinstance(value, (int, float)) and pd.notna(value):
-                        compare_df.at[row_index, col] = f"{value:+.2f}" if metric_label == "평균 대비" else f"{value:.2f}"
+            for row_index, row_type in enumerate(row_types):
+                if row_type == "metric":
+                    for col in numeric_columns:
+                        value = compare_df.at[row_index, col]
+                        if isinstance(value, (int, float)) and pd.notna(value):
+                            compare_df.at[row_index, col] = f"{value:.2f}"
 
             def style_comparison_rows(row):
                 row_type = row_types[row.name]
@@ -828,8 +792,6 @@ if not db.empty and data_scale and result is not None:
                     ] * len(row)
                 if row_type == "current":
                     return ["background-color: #F4F7FB; font-weight: bold;"] * len(row)
-                if row_type == "summary":
-                    return ["font-weight: bold;"] * len(row)
                 return [""] * len(row)
 
             styled_compare_df = compare_df.style.apply(style_comparison_rows, axis=1)
