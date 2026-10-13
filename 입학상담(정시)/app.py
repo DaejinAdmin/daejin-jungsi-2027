@@ -33,7 +33,7 @@ st.markdown("""
         --navy: #082070; --navy-deep: #051550; --primary: #1D3FA0; --tint: #E9EDF8;
         --silver: #D8E0E8; --text: #1B2440; --muted: #55607A; --line: #DDE3F0; --bg: #F3F5FB;
     }
-    #MainMenu, footer, header { visibility: hidden; } /* 온라인 배포시 불필요한 헤더/푸터 완전 숨김 */
+    #MainMenu, footer, header { visibility: hidden; } 
     .stApp { background: var(--bg); color: var(--text); font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
     .stApp::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 999999; background: linear-gradient(90deg, var(--navy-deep), var(--navy) 50%, var(--primary)); }
     .block-container { max-width: 1440px; padding-top: 3.5rem; padding-bottom: 3rem; }
@@ -68,9 +68,6 @@ st.markdown("""
     .subject-title { font-size: 16px; color: var(--navy); font-weight: 850; border-left: 4px solid var(--primary); padding-left: 12px; margin: 4px 0 16px; }
 
     .rule-strip { display: flex; gap: 14px; flex-wrap: wrap; margin: 26px 0; }
-    .rule-item { flex: 1; min-width: 210px; background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary); border-radius: 14px; padding: 18px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.7; box-shadow: 0 4px 12px -6px rgba(8, 32, 112, 0.10); }
-    .rule-item strong { color: var(--navy); font-size: 17px; font-weight: 800; display: block; margin-bottom: 5px; }
-
     .score-hero { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%); border-radius: 20px; padding: 30px; color: #FFFFFF; margin-bottom: 20px; box-shadow: 0 12px 24px rgba(8, 32, 112, 0.22); }
     .score-hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%); }
     .score-label { font-size: 15.5px; font-weight: 700; color: #C3CEEA; }
@@ -94,9 +91,12 @@ st.markdown("""
     .section-title { gap: 10px; font-size: 20px; margin: 2px 0 14px; }
     .step { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
     .subject-title { font-size: 15px; margin: 3px 0 10px; padding-left: 10px; }
+    
+    /* 1. 우수영역 규정 박스 및 폰트 강제 확대 */
     .rule-strip { gap: 12px; margin: 18px 0 22px; }
-    .rule-item { min-width: 190px; padding: 14px 16px; border-radius: 12px; font-size: 13px; line-height: 1.55; box-shadow: none; }
-    .rule-item strong { font-size: 15px; margin-bottom: 4px; }
+    .rule-item { min-width: 190px; padding: 16px 18px; border-radius: 12px; font-size: 15.5px; color: var(--muted); line-height: 1.6; box-shadow: none; background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary); }
+    .rule-item strong { font-size: 18px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
+    
     .score-hero { border-radius: 16px; padding: clamp(20px, 2.2vw, 28px); margin-bottom: 14px; box-shadow: 0 7px 18px rgba(8, 32, 112, 0.16); }
     .score-number { font-size: clamp(38px, 4vw, 58px); }
     .score-footer { font-size: 13px; padding-top: 12px; }
@@ -155,7 +155,7 @@ def display_ratio(value):
     return text if text == "—" or ":" in text else f"{display_number(value)}:1"
 
 # ==================================================
-# 4. 데이터 로딩 (온라인 자동 파일 스캔 락 적용)
+# 4. 데이터 로딩
 # ==================================================
 @st.cache_data(show_spinner=False)
 def load_data(file_path, header_row):
@@ -173,12 +173,11 @@ def load_data(file_path, header_row):
     df["모집단위명"] = df["모집단위명"].map(normalize_dept)
     return df[df["모집단위명"] != ""].reset_index(drop=True)
 
-# [온라인 전용 튜닝] 서버 폴더 전체 스캔 배제 -> 가장 유력한 엑셀 파일 하나를 강제 타겟팅
 target_files = [f for f in os.listdir(BASE_DIR) if "정시" in f and (f.endswith(".xls") or f.endswith(".xlsx") or f.endswith(".csv")) and not f.startswith("~")]
 ONLINE_TARGET_FILE = target_files[0] if target_files else None
 
 db = pd.DataFrame()
-header_line = 1 # 내부적으로 2번째 행(인덱스 1)을 기본 헤더로 고정 처리
+header_line = 1 
 if ONLINE_TARGET_FILE:
     try:
         db = load_data(str(BASE_DIR / ONLINE_TARGET_FILE), header_line)
@@ -251,12 +250,15 @@ def build_history(record):
     return pd.DataFrame(rows)
 
 # ==================================================
-# 6. 헤더 및 입력 영역
+# 6. 헤더 및 입력 영역 (온라인 로고 절대경로 고정)
 # ==================================================
 head_c1, head_c2 = st.columns([0.8, 9.2])
 with head_c1:
-    if os.path.exists("logo.png"): show_logo("logo.png")
-    elif os.path.exists("logo.jpg"): show_logo("logo.jpg")
+    # 2. 서버 절대경로(BASE_DIR) 매핑을 통한 로고 추적 강제화
+    logo_png = BASE_DIR / "logo.png"
+    logo_jpg = BASE_DIR / "logo.jpg"
+    if logo_png.exists(): show_logo(str(logo_png))
+    elif logo_jpg.exists(): show_logo(str(logo_jpg))
 with head_c2:
     st.markdown(
         """
@@ -291,7 +293,6 @@ with st.container(border=True):
         matching = db[db["모집단위명"] == selected_dept]
         if len(matching) == 1: record = matching.iloc[0]
         elif len(matching) > 1:
-            # 온라인 모드에서는 다중 데이터 시 가장 첫 행을 자동 강제할당하여 UI 번잡함 최소화
             record = matching.iloc[0]
 
 with st.container(border=True):
@@ -479,4 +480,3 @@ if not history.empty:
             table["추가합격"] = table["추가합격"].map(display_text)
             for c in ("최고", "평균", "최저"): table[c] = table[c].map(display_number)
             st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
-            
