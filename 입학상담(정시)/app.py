@@ -98,17 +98,34 @@ st.markdown("""
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
 
-    /* [튜닝 포인트 1] Streamlit 네이티브 컬럼을 직접 추적하여 세로 구분선(Border) 강제 주입 */
-    div[data-testid="column"]:has(.subject-title) { border-right: 1.5px solid #D0D7E5; padding-right: 15px; }
-    div[data-testid="column"]:has(.subject-title):last-child { border-right: none; padding-right: 0; }
+    /* [튜닝 포인트 1] 하위 호환성 전용 세로 구분선 (구형 브라우저 완벽 대응 구조적 CSS) */
+    div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(2) > div[data-testid="column"]:not(:last-child),
+    div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(3) > div[data-testid="column"]:not(:last-child) {
+        border-right: 1.5px solid #DDE3F0;
+        padding-right: 18px;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(2) > div[data-testid="column"]:not(:first-child),
+    div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(3) > div[data-testid="column"]:not(:first-child) {
+        padding-left: 8px;
+    }
     
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
         .score-hero { padding: 20px; }
         .section-title { font-size: 18px; }
-        div[data-testid="column"]:has(.subject-title) { border-right: none; padding-right: 0; border-bottom: 1.5px solid #D0D7E5; padding-bottom: 15px; margin-bottom: 15px; }
-        div[data-testid="column"]:has(.subject-title):last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+        div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(2) > div[data-testid="column"]:not(:last-child),
+        div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(3) > div[data-testid="column"]:not(:last-child) {
+            border-right: none;
+            padding-right: 0;
+            border-bottom: 1.5px solid #DDE3F0;
+            padding-bottom: 18px;
+            margin-bottom: 15px;
+        }
+        div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(2) > div[data-testid="column"]:not(:first-child),
+        div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(3) > div[data-testid="column"]:not(:first-child) {
+            padding-left: 0;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -263,7 +280,6 @@ with head_c2:
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
         <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
-        """,
         unsafe_allow_html=True,
     )
 
@@ -614,7 +630,7 @@ if not history.empty:
 
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
-                    .properties(height=330, padding={"left": 8, "right": 24, "top": 14, "bottom": 4})
+                    .properties(height=300, padding={"left": 8, "right": 24, "top": 14, "bottom": 0})
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
                         labelFont="Pretendard, Malgun Gothic, sans-serif",
@@ -623,9 +639,9 @@ if not history.empty:
                 )
                 st.altair_chart(chart, use_container_width=True)
                 
-                # [튜닝 포인트 2] 좌측 정렬되던 범례를 강제로 정중앙 배치 (HTML/CSS 활용)
+                # [튜닝 포인트 2] 차트와 범례 사이의 불필요한 공백을 강제로 당겨서 밀착 (-28px)
                 st.markdown(
-                    "<div style='text-align: center; margin-top: 15px; font-size: 13.5px;'>"
+                    "<div style='text-align: center; margin-top: -28px; margin-bottom: 10px; font-size: 13.5px; position: relative; z-index: 10;'>"
                     "<span style='color:#3157C8;font-weight:800;'>● 최고점</span> &nbsp;&nbsp;&nbsp; "
                     "<span style='color:#087F75;font-weight:800;'>● 최저점</span> &nbsp;&nbsp;&nbsp; "
                     "<span style='color:#14264D;font-weight:800;'>◆ 평균점</span> &nbsp;&nbsp;&nbsp; "
