@@ -270,7 +270,7 @@ st.markdown(
     """
     <div class="rule-strip">
         <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>02 &nbsp; 60%반영과목 제외 과목 중 40%</strong>남은 국·수·영 + 탐구 상위 1과목 + 한국사</div>
+        <div class="rule-item"><strong>02 &nbsp; 60%반영과목 제외 과목 중 40%</strong> 60% 선택 제외 국·수·영, 탐구 상위 1과목, 한국사 중 </div>
         <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
     </div>
     """,
