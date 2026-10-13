@@ -98,7 +98,7 @@ st.markdown("""
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
     [data-testid="stAlert"] { border-radius: 10px; }
 
-    /* [튜닝 포인트 1] 하위 호환성 전용 세로 구분선 (구형 브라우저 완벽 대응 구조적 CSS) */
+    /* 과목 입력 영역 세로 구분선 (하위 호환성 완벽 대응) */
     div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(2) > div[data-testid="column"]:not(:last-child),
     div[data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) div[data-testid="stHorizontalBlock"]:nth-of-type(3) > div[data-testid="column"]:not(:last-child) {
         border-right: 1.5px solid #DDE3F0;
@@ -280,6 +280,7 @@ with head_c2:
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
         <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -628,9 +629,10 @@ if not history.empty:
                     text="표시:N"
                 )
 
+                # [디테일 튜닝] 차트 높이를 260px로 줄이고 패딩을 조정하여 범례와의 간격을 상향 조정
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
-                    .properties(height=300, padding={"left": 8, "right": 24, "top": 14, "bottom": 0})
+                    .properties(height=260, padding={"left": 8, "right": 24, "top": 10, "bottom": 0})
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
                         labelFont="Pretendard, Malgun Gothic, sans-serif",
@@ -639,9 +641,9 @@ if not history.empty:
                 )
                 st.altair_chart(chart, use_container_width=True)
                 
-                # [튜닝 포인트 2] 차트와 범례 사이의 불필요한 공백을 강제로 당겨서 밀착 (-28px)
+                # [디테일 튜닝] 마진 상단을 -12px로 완만하게 조정하여 표와 범례가 자연스럽게 밀착되도록 수정
                 st.markdown(
-                    "<div style='text-align: center; margin-top: -28px; margin-bottom: 10px; font-size: 13.5px; position: relative; z-index: 10;'>"
+                    "<div style='text-align: center; margin-top: -12px; margin-bottom: 14px; font-size: 13.5px; position: relative; z-index: 10;'>"
                     "<span style='color:#3157C8;font-weight:800;'>● 최고점</span> &nbsp;&nbsp;&nbsp; "
                     "<span style='color:#087F75;font-weight:800;'>● 최저점</span> &nbsp;&nbsp;&nbsp; "
                     "<span style='color:#14264D;font-weight:800;'>◆ 평균점</span> &nbsp;&nbsp;&nbsp; "
