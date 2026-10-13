@@ -283,7 +283,7 @@ with st.container(border=True):
     dept_col, info_col = st.columns([2, 1])
     with dept_col: selected_dept = st.selectbox("모집단위", departments, key="selected_dept", on_change=invalidate_result)
     with info_col:
-        st.info("이공계열 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "일반계열 · 별도 가산점 없음")
+        st.info("이공계열 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "인문사회계열 · 별도 가산점 없음")
 
     record = None
     if not db.empty:
