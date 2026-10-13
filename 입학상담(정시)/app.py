@@ -379,7 +379,7 @@ with result_col:
             st.metric(f"40% 반영 · {second_name}", f"{second_score * 0.4:.2f}")
             st.caption(f"{second_score:.2f} × 40%")
 
-        with st.expander("계산 근거 자세히 보기"):
+        with st.expander("산출 근거 자세히 보기"):
             detail = pd.DataFrame({
                 "반영 영역": [first_name, second_name],
                 "가산·등급 환산 후 점수": [f"{first_score:.2f}", f"{second_score:.2f}"],
