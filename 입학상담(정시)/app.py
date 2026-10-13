@@ -738,7 +738,6 @@ with comparison_col:
                     styled_gap = styled_gap.applymap(color_gap, subset=["내 점수와의 차이"])
 
                 st.dataframe(styled_gap, hide_index=True, use_container_width=True)
-                st.caption("※ 전년도 결과와의 단순 점수 비교이며, 합격 여부를 보장하지 않습니다.")
 
             elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning(
