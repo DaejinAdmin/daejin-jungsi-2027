@@ -261,7 +261,8 @@ with head_c2:
     st.markdown(
         """
         <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
-        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>""",
+        <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -371,6 +372,13 @@ with result_col:
         second_name, second_score = result["second"]
 
         f_col, s_col = st.columns(2)
+        with f_col:
+            st.metric(f"60% 반영 · {first_name}", f"{first_score * 0.6:.2f}")
+            st.caption(f"{first_score:.2f} × 60%")
+        with s_col:
+            st.metric(f"40% 반영 · {second_name}", f"{second_score * 0.4:.2f}")
+            st.caption(f"{second_score:.2f} × 40%")
+
         with st.expander("산출 근거 자세히 보기"):
             detail = pd.DataFrame({
                 "반영 영역": [first_name, second_name],
