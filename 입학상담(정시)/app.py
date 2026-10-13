@@ -652,8 +652,7 @@ if not history.empty:
 if not db.empty and data_scale and result is not None:
     st.divider()
     st.markdown('<div class="section-title"><span class="step">07</span>모집단위 추천 및 비교</div>', unsafe_allow_html=True)
-    st.caption("현재 입력한 수능 성적을 각 모집단위의 기존 환산점수 산식으로 다시 계산하고, 최근 3개년 입결과 비교합니다. 참고용 분석이며 합격을 보장하거나 확률을 예측하지 않습니다.")
-
+    
     def make_dept_analysis(dept_name):
         matches = db[db["모집단위명"] == dept_name]
         if matches.empty:
@@ -683,13 +682,13 @@ if not db.empty and data_scale and result is not None:
             gap_to_avg = round(dept_score["score"] - recent_avg, 2)
             gap_to_min = round(dept_score["score"] - recent_min, 2)
             if dept_score["score"] >= recent_avg:
-                recommendation = "안정 참고"
+                recommendation = "안정"
                 rationale = f"현재 환산점수가 2026 평균보다 {gap_to_avg:+.2f}점입니다."
             elif dept_score["score"] >= recent_min:
-                recommendation = "적정·경계 참고"
+                recommendation = "적정·경계"
                 rationale = f"2026 최저점 이상, 평균점 미만입니다(평균 대비 {gap_to_avg:+.2f}점)."
             else:
-                recommendation = "상향 참고"
+                recommendation = "상향"
                 rationale = f"현재 환산점수가 2026 최저점보다 {abs(gap_to_min):.2f}점 낮습니다."
 
         return {
@@ -714,14 +713,14 @@ if not db.empty and data_scale and result is not None:
     recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
 
     with recommendation_tab:
-        st.markdown("#### 현재 점수 기준 추천 참고 목록")
-        st.caption("분류 기준: 현재 점수 ≥ 2026 평균 → 안정 참고 / 2026 최저 이상~평균 미만 → 적정·경계 참고 / 2026 최저 미만 → 상향 참고")
+        st.markdown("#### 현재 점수 기준 추천 목록")
+        st.caption("분류 기준: 현재 점수 ≥ 2026 평균 이상 → 안정 / 2026 최저 이상~평균 미만 → 적정·경계 / 2026 최저 미만 → 상향")
         recommendation_rows = []
         for item in analysis_by_dept.values():
             if item["분류"] == "자료 확인 필요":
                 continue
             recommendation_rows.append({
-                "참고 분류": item["분류"],
+                "분류": item["분류"],
                 "모집단위": item["모집단위"],
                 "내 환산점수": item["현재 환산점수"],
                 "2026 평균": item["2026 평균"],
@@ -732,22 +731,37 @@ if not db.empty and data_scale and result is not None:
             })
         if recommendation_rows:
             rec_df = pd.DataFrame(recommendation_rows)
-            rec_order = {"안정 참고": 0, "적정·경계 참고": 1, "상향 참고": 2}
-            rec_df["_order"] = rec_df["참고 분류"].map(rec_order)
+            rec_order = {"안정": 0, "적정·경계": 1, "상향": 2}
+            rec_df["_order"] = rec_df["분류"].map(rec_order)
             rec_df = rec_df.sort_values(["_order", "평균 대비"], ascending=[True, False]).drop(columns="_order")
+
+            def style_recommendation_cell(value):
+                # 평균/최저보다 높은 점수 또는 안정 분류는 파란색으로 강조
+                value_text = str(value)
+                if value_text == "안정":
+                    return "color: #1D4ED8; font-weight: 800;"
+                if value_text == "적정·경계":
+                    return "color: #B45309; font-weight: 800;"
+                if value_text == "상향":
+                    return "color: #DC2626; font-weight: 800;"
+                if value_text.startswith("현재 환산점수가 2026 평균보다 +"):
+                    return "color: #1D4ED8; font-weight: 700;"
+                if "2026 최저점 이상" in value_text:
+                    return "color: #1D4ED8; font-weight: 700;"
+                if "낮습니다" in value_text:
+                    return "color: #DC2626; font-weight: 700;"
+                return ""
+
+            styled_rec = rec_df.style.format({
+                "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
+                "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
+            }, na_rep="—").map(style_recommendation_cell, subset=["분류", "분류 근거"]) if hasattr(rec_df.style, "map") else rec_df.style.format({
+                "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
+                "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
+            }, na_rep="—").applymap(style_recommendation_cell, subset=["분류", "분류 근거"])
             st.dataframe(
-                rec_df.style.format({
-                    "내 환산점수": "{:.2f}", "2026 평균": "{:.2f}",
-                    "평균 대비": "{:+.2f}", "2026 최저": "{:.2f}", "최저 대비": "{:+.2f}"
-                }, na_rep="—"),
+                styled_rec,
                 hide_index=True, use_container_width=True, height=420
-            )
-            st.download_button(
-                "추천 목록 CSV 다운로드",
-                data=rec_df.to_csv(index=False, encoding="utf-8-sig"),
-                file_name="대진대_모집단위_추천참고.csv",
-                mime="text/csv",
-                use_container_width=False,
             )
         else:
             st.info("추천 분류에 필요한 2026학년도 입시 결과가 충분하지 않습니다.")
@@ -777,7 +791,7 @@ if not db.empty and data_scale and result is not None:
                 ("2024 평균", ("2024", "평균")),
                 ("2024 최저", ("2024", "최저")),
                 ("2026 평균 대비", "gap"),
-                ("참고 분류", "category"),
+                ("분류", "category"),
             ]
             for metric_label, metric_key in metrics:
                 row = {"비교 항목": metric_label}
@@ -802,6 +816,5 @@ if not db.empty and data_scale and result is not None:
                     if isinstance(value, (int, float)) and pd.notna(value):
                         compare_df.at[row_index, col] = f"{value:+.2f}" if metric_label == "2026 평균 대비" else f"{value:.2f}"
             st.dataframe(compare_df, hide_index=True, use_container_width=True)
-            st.caption("※ 모집단위마다 적용되는 가산점은 기존 계산 함수로 반영했습니다. 모집인원·모집군·충원 등 다른 전형 요소는 이 비교표에 포함하지 않았습니다.")
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
