@@ -96,7 +96,27 @@ st.markdown("""
     .subject-title { font-size: 15px; margin: 3px 0 10px; padding-left: 10px; }
     
     [data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    [data-testid="stDataFrame"] [role="grid"] { font-size: 13px !important; }
+    [data-testid="stDataFrame"] [role="columnheader"] { font-weight: 800 !important; }
     [data-testid="stAlert"] { border-radius: 10px; }
+    [data-testid="stCaptionContainer"] { font-size: 12px !important; line-height: 1.55 !important; }
+    .status { font-size: 17px; padding: 17px 20px; border: 1px solid rgba(8,32,112,.06); }
+    .status .status-detail { display: inline-block; margin-top: 4px; font-size: 14px; font-weight: 700; }
+    @media (max-width: 900px) {
+        [data-testid="stDataFrame"] [role="grid"] { font-size: 12px !important; }
+        [data-testid="stCaptionContainer"] { font-size: 11px !important; }
+    }
+
+    /* [튜닝 포인트 1] 과목 입력 영역 세로 구분선 부여 */
+    .col-divider { border-right: 1px solid var(--line); padding-right: 15px; }
+    
+    @media (max-width: 900px) {
+        .block-container { padding-top: 1.5rem; }
+        .rule-item { min-width: 100%; }
+        .score-hero { padding: 20px; }
+        .section-title { font-size: 18px; }
+        .col-divider { border-right: none; padding-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 15px; margin-bottom: 15px; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -256,9 +276,9 @@ with head_c2:
 st.markdown(
     """
     <div class="rule-strip">
-        <div class="rule-item"><strong>우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>60% 반영 제외 과목 중 40%</strong>남은 국·수·영 + 탐구 상위 1과목 + 한국사</div>
-        <div class="rule-item"><strong>이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
+        <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
+        <div class="rule-item"><strong>02 &nbsp; 60%반영과목 제외 과목 중 40%</strong>남은 국·수·영 + 탐구 상위 1과목 + 한국사</div>
+        <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
     </div>
     """,
     unsafe_allow_html=True
@@ -270,7 +290,7 @@ with st.container(border=True):
     dept_col, info_col = st.columns([2, 1])
     with dept_col: selected_dept = st.selectbox("모집단위", departments, key="selected_dept", on_change=invalidate_result)
     with info_col:
-        st.info("이공계열 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "인문사회계열 · 별도 가산점 없음")
+        st.info("이공계열 · 수학 및 과학탐구 가산점 대상" if selected_dept in ENG_DEPTS else "일반계열 · 별도 가산점 없음")
 
     record = None
     if not db.empty:
@@ -286,21 +306,29 @@ with st.container(border=True):
 
     c1, c2, c3, c4 = st.columns(4)
     with c1: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("국어"); kor_score = number_input("국어 백분위", "kor")
+        st.markdown('</div>', unsafe_allow_html=True)
     with c2: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("수학"); math_score = number_input("수학 백분위", "math"); math_subj = st.selectbox("수학 선택과목", ["확률과 통계", "미적분", "기하"], key="math_subj", on_change=invalidate_result)
+        st.markdown('</div>', unsafe_allow_html=True)
     with c3: 
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("영어"); eng_grade = st.selectbox("영어 등급", ["미선택"] + list(range(1, 10)), key="eng_grade", on_change=invalidate_result)
+        st.markdown('</div>', unsafe_allow_html=True)
     with c4: 
         subject_title("한국사"); hist_grade = st.selectbox("한국사 등급", ["미선택"] + list(range(1, 10)), key="hist_grade", on_change=invalidate_result)
 
     st.divider()
     iq1, iq2 = st.columns(2)
     with iq1:
+        st.markdown('<div class="col-divider">', unsafe_allow_html=True)
         subject_title("탐구 01")
         sc1, sc2 = st.columns([1.4, 1])
         with sc1: inq1_subj = st.selectbox("탐구 1 과목", INQUIRY_SUBJECTS, key="inq1_subj", on_change=invalidate_result)
         with sc2: inq1_score = number_input("탐구 1 백분위", "inq1")
+        st.markdown('</div>', unsafe_allow_html=True)
     with iq2:
         subject_title("탐구 02")
         sc3, sc4 = st.columns([1.4, 1])
@@ -359,14 +387,8 @@ with result_col:
         second_name, second_score = result["second"]
 
         f_col, s_col = st.columns(2)
-        with f_col:
-            st.metric(f"60% 반영 · {first_name}", f"{first_score * 0.6:.2f}")
-            st.caption(f"{first_score:.2f} × 60%")
-        with s_col:
-            st.metric(f"40% 반영 · {second_name}", f"{second_score * 0.4:.2f}")
-            st.caption(f"{second_score:.2f} × 40%")
 
-        with st.expander("계산 근거 자세히 보기"):
+        with st.expander("산출 내역 자세히 보기"):
             detail = pd.DataFrame({
                 "반영 영역": [first_name, second_name],
                 "가산·등급 환산 후 점수": [f"{first_score:.2f}", f"{second_score:.2f}"],
@@ -399,7 +421,7 @@ with comparison_col:
                     f"""
                     <div class="status" style="background:{bg}; color:{c};">
                         {msg}<br>
-                        <span style="font-size:14px; font-weight:700;">전년도 평균 대비 {score - avg_score:+.2f}점</span>
+                        <span class="status-detail">전년도 평균 대비 {score - avg_score:+.2f}점</span>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -426,8 +448,24 @@ with comparison_col:
                 if hasattr(gap_table.style, 'map'): styled_table = gap_table.style.map(color_gap)
                 else: styled_table = gap_table.style.applymap(color_gap)
 
+                # 표는 숫자 판독을 우선해 글자 크기·행 높이·헤더 대비를 조정합니다.
+                styled_table = styled_table.set_properties(**{
+                    "font-size": "13px",
+                    "padding": "7px 9px",
+                    "white-space": "nowrap",
+                    "font-variant-numeric": "tabular-nums",
+                }).set_table_styles([
+                    {"selector": "th", "props": [
+                        ("background-color", "#F1F4FA"),
+                        ("color", "#082070"),
+                        ("font-weight", "800"),
+                        ("font-size", "12px"),
+                        ("border-bottom", "1px solid #DDE3F0"),
+                    ]},
+                    {"selector": "td", "props": [("border-bottom", "1px solid #EDF0F6")]},
+                ])
                 st.dataframe(styled_table, hide_index=True, use_container_width=True)
-                st.caption("※ 전년도 결과와의 단순 점수 비교이며, 합격 여부를 보장하지 않습니다.")
+                st.caption("※ 전년도 결과와의 단순 점수 비교이며, 합격 여부를 보장하지 않습니다. 실제 합격 여부를 의미하지 않습니다.")
             elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning("2026년 최고·평균·최저 점수의 값 또는 순서가 올바르지 않아 판정 문구를 표시하지 않습니다. 원본 입시 결과 자료를 확인해 주세요.")
             else:
@@ -441,6 +479,7 @@ if not history.empty:
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
             if c_data[["최고", "평균", "최저"]].notna().any().any():
 
+                # 차트 개선: 여백 확보, 정보 계층화, 라벨 잘림 방지
                 chart_values = [
                     value
                     for value in c_data[["최고", "평균", "최저"]].to_numpy().ravel().tolist()
@@ -449,7 +488,7 @@ if not history.empty:
                 chart_values.append(float(result["score"]))
                 x_min, x_max = min(chart_values), max(chart_values)
                 span = x_max - x_min
-                pad = max(span * 0.12, 1.0)
+                pad = max(span * 0.16, 1.4)
                 domain_min = max(0, x_min - pad)
                 domain_max = min(100, x_max + pad)
                 if domain_max - domain_min < 2:
@@ -475,9 +514,30 @@ if not history.empty:
                         gridWidth=1
                     )
                 )
+                x_encoding = alt.X(
+                    "점수:Q",
+                    title="환산점수 · 100점 기준",
+                    scale=alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False),
+                    axis=alt.Axis(
+                        titleFontSize=12,
+                        titleFontWeight=600,
+                        titleColor="#64708A",
+                        titlePadding=14,
+                        labelFontSize=11,
+                        labelColor="#64708A",
+                        tickCount=6,
+                        grid=True,
+                        gridColor="#E9EDF5",
+                        gridDash=[2, 3],
+                        domain=False,
+                        tickSize=0,
+                        format=".1f"
+                    )
+                )
 
                 base = alt.Chart(chart_data).encode(y=y_encoding)
 
+                # 최고점~최저점의 범위
                 range_rule = base.mark_rule(
                     color="#CBD5E5",
                     strokeWidth=5,
@@ -512,6 +572,7 @@ if not history.empty:
                     ]
                 )
 
+                # 최저점·최고점: 서로 다른 색으로 구분
                 min_point = base.mark_point(
                     filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
                 ).encode(
@@ -527,6 +588,7 @@ if not history.empty:
                              alt.Tooltip("최고:Q", format=".2f", title="최고점")]
                 )
 
+                # 평균점: 네이비 마름모
                 avg_point = base.mark_point(
                     filled=True, color="#14264D", shape="diamond", size=145,
                     stroke="#FFFFFF", strokeWidth=1
@@ -536,21 +598,23 @@ if not history.empty:
                              alt.Tooltip("평균:Q", format=".2f", title="평균점")]
                 )
 
+                # 끝점 점수 라벨
                 max_txt = base.mark_text(
-                    align="left", dx=8, dy=-10, fontSize=11,
+                    align="left", dx=9, dy=-9, fontSize=12,
                     color="#2447A8", fontWeight=700
                 ).encode(
                     x="최고:Q",
                     text=alt.Text("최고:Q", format=".2f")
                 )
                 min_txt = base.mark_text(
-                    align="right", dx=-8, dy=10, fontSize=11,
+                    align="right", dx=-9, dy=10, fontSize=12,
                     color="#087F75", fontWeight=700
                 ).encode(
                     x="최저:Q",
                     text=alt.Text("최저:Q", format=".2f")
                 )
 
+                # 현재 내 점수: 붉은 점선 + 상단 라벨
                 my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
                 my_line = alt.Chart(my_score_df).mark_rule(
                     color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
@@ -562,10 +626,24 @@ if not history.empty:
                     ),
                     tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")]
                 )
+                my_label = alt.Chart(
+                    pd.DataFrame({"내 점수": [float(result["score"])], "표시": [f'내 점수 {float(result["score"]):.2f}']})
+                ).mark_text(
+                    align="center", baseline="bottom", dy=-8, fontSize=11,
+                    fontWeight=700, color="#D9344D"
+                ).encode(
+                    x=alt.X(
+                        "내 점수:Q",
+                        scale=alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False),
+                        axis=None
+                    ),
+                    y=alt.value(0),
+                    text="표시:N"
+                )
 
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
-                    .properties(height=260, padding={"left": 8, "right": 24, "top": 10, "bottom": 0})
+                    .properties(height=340, padding={"left": 10, "right": 30, "top": 18, "bottom": 6})
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
                         labelFont="Pretendard, Malgun Gothic, sans-serif",
@@ -573,14 +651,12 @@ if not history.empty:
                     )
                 )
                 st.altair_chart(chart, use_container_width=True)
-                
-                st.markdown(
-                    "<div style='text-align: center; margin-top: -12px; margin-bottom: 14px; font-size: 13.5px; position: relative; z-index: 10;'>"
-                    "<span style='color:#3157C8;font-weight:800;'>● 최고점</span> &nbsp;&nbsp;&nbsp; "
-                    "<span style='color:#087F75;font-weight:800;'>● 최저점</span> &nbsp;&nbsp;&nbsp; "
-                    "<span style='color:#14264D;font-weight:800;'>◆ 평균점</span> &nbsp;&nbsp;&nbsp; "
+                st.caption(
+                    "<span style='color:#3157C8;font-weight:800;'>● 최고점</span>　"
+                    "<span style='color:#087F75;font-weight:800;'>● 최저점</span>　"
+                    "<span style='color:#14264D;font-weight:800;'>◆ 평균점</span>　"
                     "<span style='color:#E5485D;font-weight:800;'>┆ 내 점수</span>"
-                    "</div>",
+                    "　|　점이나 선에 마우스를 올리면 상세 점수를 확인할 수 있습니다.",
                     unsafe_allow_html=True
                 )
 
@@ -592,4 +668,19 @@ if not history.empty:
             table["경쟁률"] = table["경쟁률"].map(display_ratio)
             table["추가합격"] = table["추가합격"].map(display_text)
             for c in ("최고", "평균", "최저"): table[c] = table[c].map(display_number)
-            st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
+            summary_table = table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]].style.set_properties(**{
+                "font-size": "13px",
+                "padding": "8px 7px",
+                "white-space": "nowrap",
+                "font-variant-numeric": "tabular-nums",
+            }).set_table_styles([
+                {"selector": "th", "props": [
+                    ("background-color", "#F1F4FA"),
+                    ("color", "#082070"),
+                    ("font-weight", "800"),
+                    ("font-size", "12px"),
+                    ("border-bottom", "1px solid #DDE3F0"),
+                ]},
+                {"selector": "td", "props": [("border-bottom", "1px solid #EDF0F6")]},
+            ])
+            st.dataframe(summary_table, hide_index=True, use_container_width=True)
