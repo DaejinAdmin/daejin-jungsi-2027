@@ -652,8 +652,6 @@ if not history.empty:
 if not db.empty and data_scale and result is not None:
     st.divider()
     st.markdown('<div class="section-title"><span class="step">07</span>모집단위 추천 및 비교</div>', unsafe_allow_html=True)
-    st.caption("현재 입력한 수능 성적을 각 모집단위의 기존 환산점수 산식으로 다시 계산하고, 최근 3개년 입결과 비교합니다. 참고용 분석이며 합격을 보장하거나 확률을 예측하지 않습니다.")
-
     def make_dept_analysis(dept_name):
         matches = db[db["모집단위명"] == dept_name]
         if matches.empty:
@@ -836,6 +834,5 @@ if not db.empty and data_scale and result is not None:
 
             styled_compare_df = compare_df.style.apply(style_comparison_rows, axis=1)
             st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
-            st.caption("※ 모집단위마다 적용되는 가산점은 기존 계산 함수로 반영했습니다. 모집인원·모집군·충원 등 다른 전형 요소는 이 비교표에 포함하지 않았습니다.")
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
