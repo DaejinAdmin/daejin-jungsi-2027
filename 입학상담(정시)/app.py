@@ -495,10 +495,18 @@ with st.container(border=True):
             "모집단위", departments, key="selected_dept", on_change=invalidate_result
         )
     with info_col:
-        st.info(
-            "이공계열 · 수학 및 과학탐구 가산점 대상"
-            if selected_dept in ENG_DEPTS
-            else "인문사회계열 · 별도 가산점 없음"
+        is_eng = selected_dept in ENG_DEPTS
+        info_bg = "rgba(29, 63, 160, 0.08)" if is_eng else "rgba(5, 150, 105, 0.08)"
+        info_border = "1px solid rgba(29, 63, 160, 0.2)" if is_eng else "1px solid rgba(5, 150, 105, 0.2)"
+        info_color = "#1D3FA0" if is_eng else "#059669"
+        info_text = "이공계열 · 수학 및 과학탐구 가산점 대상" if is_eng else "인문사회계열 · 별도 가산점 없음"
+        st.markdown(
+            f"""
+            <div style="background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 12px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center; height: 100%;">
+                {info_text}
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
     record = None
@@ -1156,3 +1164,8 @@ if not db.empty and data_scale and result is not None:
             st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
