@@ -379,7 +379,7 @@ with result_col:
             st.metric(f"40% 반영 · {second_name}", f"{second_score * 0.4:.2f}")
             st.caption(f"{second_score:.2f} × 40%")
 
-        with st.expander("산출 근거 자세히 보기"):
+        with st.expander("계산 근거 자세히 보기"):
             detail = pd.DataFrame({
                 "반영 영역": [first_name, second_name],
                 "가산·등급 환산 후 점수": [f"{first_score:.2f}", f"{second_score:.2f}"],
@@ -435,10 +435,19 @@ with comparison_col:
                     elif '초과' in val_str: return 'color: #1D3FA0; font-weight: 800;'
                     return ''
 
-                if hasattr(gap_table.style, 'map'): styled_table = gap_table.style.map(color_gap)
-                else: styled_table = gap_table.style.applymap(color_gap)
-
-                st.dataframe(styled_table, hide_index=True, use_container_width=True)
+                gap_styler = gap_table.style
+                if hasattr(gap_styler, 'map'):
+                    gap_styler = gap_styler.map(color_gap, subset=["내 점수와의 차이"])
+                else:
+                    gap_styler = gap_styler.applymap(color_gap, subset=["내 점수와의 차이"])
+                gap_styler = gap_styler.set_table_styles([
+                    {"selector": "th", "props": [("background-color", "#EEF2FA"), ("color", "#082070"), ("font-weight", "700"), ("font-size", "13px"), ("border-bottom", "1px solid #D5DDED"), ("padding", "10px 12px")]},
+                    {"selector": "td", "props": [("font-size", "13px"), ("padding", "10px 12px"), ("border-bottom", "1px solid #E8ECF4"), ("font-variant-numeric", "tabular-nums")]},
+                    {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#F8FAFE")]},
+                    {"selector": "tbody tr:hover", "props": [("background-color", "#EEF3FF")]},
+                    {"selector": "table", "props": [("border-collapse", "separate"), ("border-spacing", "0"), ("border", "1px solid #D8E0EE"), ("border-radius", "10px"), ("overflow", "hidden")]}
+                ])
+                st.dataframe(gap_styler, hide_index=True, use_container_width=True)
                 st.caption("※ 전년도 결과와의 단순 점수 비교이며, 합격 여부를 보장하지 않습니다.")
             elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning("2026년 최고·평균·최저 점수의 값 또는 순서가 올바르지 않아 판정 문구를 표시하지 않습니다. 원본 입시 결과 자료를 확인해 주세요.")
@@ -643,4 +652,18 @@ if not history.empty:
             table["경쟁률"] = table["경쟁률"].map(display_ratio)
             table["추가합격"] = table["추가합격"].map(display_text)
             for c in ("최고", "평균", "최저"): table[c] = table[c].map(display_number)
-            st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
+            display_cols = ["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]
+            display_table = table[display_cols].copy()
+            latest_index = display_table.index[0] if not display_table.empty else None
+            def latest_year_style(row):
+                if row.name == latest_index:
+                    return ["background-color: #F0F4FF; font-weight: 700;" for _ in row]
+                return ["" for _ in row]
+            history_styler = display_table.style.apply(latest_year_style, axis=1).set_table_styles([
+                {"selector": "th", "props": [("background-color", "#EEF2FA"), ("color", "#082070"), ("font-weight", "750"), ("font-size", "13px"), ("text-align", "center"), ("padding", "11px 10px"), ("border-bottom", "1px solid #D5DDED")]},
+                {"selector": "td", "props": [("color", "#263451"), ("font-size", "13px"), ("padding", "11px 10px"), ("border-bottom", "1px solid #E8ECF4"), ("font-variant-numeric", "tabular-nums")]},
+                {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#F8FAFE")]},
+                {"selector": "tbody tr:hover", "props": [("background-color", "#EEF3FF")]},
+                {"selector": "table", "props": [("border-collapse", "separate"), ("border-spacing", "0"), ("border", "1px solid #D8E0EE"), ("border-radius", "10px"), ("overflow", "hidden")]}
+            ])
+            st.dataframe(history_styler, hide_index=True, use_container_width=True)
