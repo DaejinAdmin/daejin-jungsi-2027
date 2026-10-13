@@ -1164,8 +1164,3 @@ if not db.empty and data_scale and result is not None:
             st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
