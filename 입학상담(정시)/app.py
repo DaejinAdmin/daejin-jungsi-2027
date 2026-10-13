@@ -727,7 +727,7 @@ with comparison_col:
 
                 gap_table = pd.DataFrame({
                     "비교 기준": ["2026 최고점", "2026 평균점", "2026 최저점"],
-                    "전년도 점수(100점)": [f"{v:,.2f}" for v in (max_score, avg_score, cut_score)],
+                    "점수": [f"{v:,.2f}" for v in (max_score, avg_score, cut_score)],
                     "내 점수와의 차이": [gap_text(v) for v in (max_score, avg_score, cut_score)],
                 })
 
