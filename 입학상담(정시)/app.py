@@ -626,7 +626,6 @@ if not db.empty and data_scale and result is not None:
             av = to_number(hist_row.get("평균"))
             mn = to_number(hist_row.get("최저"))
             
-            # 각 연도별 판정 로직 동적 계산
             status = "자료 없음"
             if av is not None and mn is not None and mx is not None:
                 if dept_score["score"] >= av:
@@ -708,11 +707,11 @@ if not db.empty and data_scale and result is not None:
             def style_recommendation_cell(value):
                 value_text = str(value)
                 if value_text == "안정":
-                    return "color: #1D4ED8; font-weight: 800;"
+                    return "color: #059669; font-weight: 800;"
                 if value_text == "적정·경계":
-                    return "color: #B45309; font-weight: 800;"
-                if value_text == "상향":
                     return "color: #DC2626; font-weight: 800;"
+                if value_text == "상향":
+                    return "color: #1D4ED8; font-weight: 800;"
                 return ""
 
             styled_rec = rec_df.style.format({
@@ -766,7 +765,6 @@ if not db.empty and data_scale and result is not None:
                     if metric_key is None:
                         value = item["현재 환산점수"] if row_type == "current" else ""
                     elif row_type == "year":
-                        # 연도별 행 타이틀 옆에 해당 연도 판정 결과(안정/적정/상향) 결합
                         yr_status = item["연도별"].get(metric_key, {}).get("판정", "")
                         value = f"[{yr_status}]" if yr_status and yr_status != "자료 없음" else ""
                     else:
@@ -783,16 +781,32 @@ if not db.empty and data_scale and result is not None:
                         value = compare_df.at[row_index, col]
                         if isinstance(value, (int, float)) and pd.notna(value):
                             compare_df.at[row_index, col] = f"{value:.2f}"
+                elif row_type == "current":
+                    for col in numeric_columns:
+                        value = compare_df.at[row_index, col]
+                        if isinstance(value, (int, float)) and pd.notna(value):
+                            compare_df.at[row_index, col] = f"{value:.2f}"
 
             def style_comparison_rows(row):
                 row_type = row_types[row.name]
-                if row_type == "year":
-                    return [
-                        "background-color: #E8EEF8; color: #17365D; font-weight: bold; border-top: 2px solid #9DB2D1;"
-                    ] * len(row)
-                if row_type == "current":
-                    return ["background-color: #F4F7FB; font-weight: bold;"] * len(row)
-                return [""] * len(row)
+                styles = []
+                for val in row:
+                    val_str = str(val)
+                    if row_type == "year":
+                        base_style = "background-color: #E8EEF8; font-weight: bold; border-top: 2px solid #9DB2D1;"
+                        if "[상향]" in val_str:
+                            styles.append(base_style + " color: #1D4ED8;")  # 파란색
+                        elif "[안정]" in val_str:
+                            styles.append(base_style + " color: #059669;")  # 초록색
+                        elif "[적정·경계]" in val_str:
+                            styles.append(base_style + " color: #DC2626;")  # 붉은색
+                        else:
+                            styles.append(base_style + " color: #17365D;")
+                    elif row_type == "current":
+                        styles.append("background-color: #F4F7FB; font-weight: bold; color: #082070;")
+                    else:
+                        styles.append("")
+                return styles
 
             styled_compare_df = compare_df.style.apply(style_comparison_rows, axis=1)
             st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
