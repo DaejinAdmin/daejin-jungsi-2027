@@ -94,7 +94,7 @@ st.markdown("""
     .section-title { gap: 10px; font-size: 20px; margin: 2px 0 14px; }
     .step { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
     .subject-title { font-size: 15px; margin: 3px 0 10px; padding-left: 10px; min-height: 23px; line-height: 1.5; box-sizing: border-box; }
-    div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
+    div[data-testid="stHorizontalBlock"] { align-items: stretch; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
     [data-testid="stWidgetLabel"] { min-height: 1.25rem; }
     
@@ -446,7 +446,7 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 if not history.empty:
-    chart_col, table_col = st.columns([1.1, 1], gap="large")
+     chart_col, table_col = st.columns([1, 1.5], gap="large")
     with chart_col:
         with st.container(border=True):
             section_title("05", "최근 3개년 점수 분포")
@@ -601,7 +601,13 @@ if not history.empty:
             table = history.sort_values("연도", ascending=False).copy()
             table["학년도"] = table["연도"] + "학년도"
             table["경쟁률"] = table["경쟁률"].map(display_ratio)
-            table["추가합격"] = table["추가합격"].map(display_text)
+            def display_count(value):
+                number = to_number(value)
+                if number is None:
+                    return display_text(value)
+                return f"{int(number):,}" if number.is_integer() else f"{number:,.1f}"
+
+            table["추가합격"] = table["추가합격"].map(display_count)
             for c in ("최고", "평균", "최저"): table[c] = table[c].map(display_number)
             st.dataframe(table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]], hide_index=True, use_container_width=True)
 
