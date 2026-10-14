@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (좌우 박스 높이 100% 동기화 및 여백 보정)
+# 2. 디자인 (다중 DOM 트리 완전 관통형 높이 동기화 CSS)
 # ==================================================
 st.markdown(
     """
@@ -92,19 +92,74 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
-    /* [핵심 수정] 좌우 컬럼(03-04, 05-06)의 외곽 흰색 박스 높이를 완벽히 동일하게 맞춤 */
-    div[data-testid="stHorizontalBlock"] { align-items: stretch !important; }
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-        min-width: 0; display: flex; flex-direction: column;
+    /* =========================================================================
+       [핵심 해결책] Streamlit 최신 DOM 구조(stColumn ~ BorderWrapper) 4단계 전체 Flex Stretch 강제
+       ========================================================================= */
+    div[data-testid="stHorizontalBlock"] {
+        align-items: stretch !important;
     }
-    div[data-testid="column"] > div {
-        flex: 1; display: flex; flex-direction: column; height: 100%;
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
+        min-width: 0;
+        display: flex !important;
+        flex-direction: column !important;
     }
+    div[data-testid="column"] > div[data-testid="stVerticalBlock"],
+    div[data-testid="stColumn"] > div[data-testid="stVerticalBlock"] {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    /* 단일 컨테이너가 들어있는 컬럼의 중간 래퍼(ElementContainer)를 100%로 확장 */
+    div[data-testid="column"] > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:only-child,
+    div[data-testid="stColumn"] > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:only-child,
+    div[data-testid="column"] > div[data-testid="stVerticalBlock"] > div.element-container:only-child,
+    div[data-testid="stColumn"] > div[data-testid="stVerticalBlock"] > div.element-container:only-child {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    /* 실제 눈에 보이는 흰색 테두리 박스를 부모 끝까지 100% 밀착 */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        flex: 1; display: flex; flex-direction: column; height: 100%;
-        background: #FFFFFF; border: 1px solid var(--line) !important; border-radius: 14px !important;
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        background: #FFFFFF;
+        border: 1px solid var(--line) !important;
+        border-radius: 14px !important;
         box-shadow: 0 2px 8px rgba(8, 32, 112, 0.055);
-        padding-bottom: 6px !important;
+        box-sizing: border-box !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] > div {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    /* 04번, 06번 내부의 마지막 카드 리스트가 남은 세로 공간을 꽉 채우도록 설정 */
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:last-child {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:last-child > div[data-testid="stMarkdown"] {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"]:last-child > div[data-testid="stMarkdown"] > div {
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     [data-testid="stImage"] img {
@@ -215,7 +270,7 @@ st.markdown(
         color: #C3CEEA; font-size: 14px; line-height: 1.65;
     }
 
-    .status { border-radius: 14px; padding: 15px 18px; margin: 10px 0 14px; font-size: 15.5px; font-weight: 800; line-height: 1.55; }
+    .status { border-radius: 14px; padding: 14px 18px; margin: 8px 0 12px; font-size: 15.5px; font-weight: 800; line-height: 1.55; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
@@ -223,13 +278,16 @@ st.markdown(
     .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
 
     /* ==================================================
-       모던 대시보드 커스텀 카드 & 뱃지 스타일 (높이 밸런스 보정)
+       모던 대시보드 커스텀 카드 & 뱃지 스타일 (자동 높이 배분)
        ================================================== */
-    /* 04번: 수평 비교 스트립 (03번 높이에 맞춰 여유 있게 확장 및 하단 여백 확보) */
-    .cmp-list { display: flex; flex-direction: column; gap: 11px; margin-top: 8px; padding-bottom: 6px; }
+    /* 04번: 수평 비교 스트립 (flex: 1로 남은 높이를 균등 분할하여 03번 바닥과 정확히 일치) */
+    .cmp-list {
+        flex: 1 1 auto; display: flex; flex-direction: column;
+        justify-content: space-between; gap: 10px; margin-top: 4px;
+    }
     .cmp-row {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 18px; background: #F8FAFE; border: 1px solid var(--line);
+        flex: 1 1 auto; display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
@@ -244,15 +302,19 @@ st.markdown(
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번: 3개년 입시 결과 요약 카드 (05번 차트 높이에 딱 맞게 슬림화 및 하단 잘림 방지) */
-    .yr-card-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; padding-bottom: 6px; }
+    /* 06번: 3개년 입시 결과 요약 카드 (컴팩트화 + flex: 1로 05번 차트 높이와 정확히 일치) */
+    .yr-card-list {
+        flex: 1 1 auto; display: flex; flex-direction: column;
+        justify-content: space-between; gap: 8px; margin-top: 2px;
+    }
     .yr-card {
+        flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center;
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 10px 14px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 9px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; flex-wrap: wrap; gap: 6px; }
-    .yr-title { font-size: 15px; font-weight: 850; color: var(--navy); }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+    .yr-title { font-size: 14.5px; font-weight: 850; color: var(--navy); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
         font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
@@ -261,10 +323,10 @@ st.markdown(
     .yr-tag b { color: var(--navy); font-weight: 800; }
     .yr-metrics {
         display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 7px 10px; text-align: center;
+        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 6px 10px; text-align: center;
     }
     .yr-m-lbl { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 1px; }
-    .yr-m-val { font-size: 14.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .yr-m-val { font-size: 14px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
 
     /* 07-①번: 3단 칸반 보드 */
     .kb-header {
@@ -748,7 +810,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역 6:4 비율 + 높이 완전 동기화)
+# 7. 결과 출력 (03, 04번 영역 6:4 비율 + 높이 100% 동기화)
 # ==================================================
 result = st.session_state.result
 
@@ -801,7 +863,7 @@ with result_col:
         with st.expander("산출 근거 자세히 보기"):
             st.markdown(
                 f"""
-                <div class="cmp-list">
+                <div class="cmp-list" style="margin-top:2px;">
                     <div class="cmp-row">
                         <span class="cmp-lbl">60% 반영 ({escape(first_name)})</span>
                         <div class="cmp-val-group">
@@ -904,7 +966,7 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역 비율 6:4 + 높이 완전 동기화)
+# 8. 결과 출력 (05, 06번 영역 비율 6:4 + 높이 100% 동기화)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
@@ -1043,7 +1105,7 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=300,
+                        height=280,
                         padding={"left": 8, "right": 24, "top": 12, "bottom": 4},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
@@ -1056,7 +1118,7 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:0px;padding-bottom:4px;font-size:12px;line-height:1.5;'>"
+                    "<div style='width:100%;text-align:center;margin-top:auto;padding-top:6px;font-size:12px;line-height:1.5;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
@@ -1099,7 +1161,7 @@ if not history.empty:
             st.markdown(cards_html, unsafe_allow_html=True)
 
 # ==================================================
-# 9. 모집단위 추천(칸반 보드) 및 모집단위 비교(스펙 그리드)
+# 9. 모집단위 추천 및 모집단위 비교
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
@@ -1182,7 +1244,7 @@ if not db.empty and data_scale and result is not None:
         if analysis is not None:
             analysis_by_dept[dept_name] = analysis
 
-    recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천 (칸반 보드)", "② 모집단위 비교 (스펙 카드)"])
+    recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
 
     with recommendation_tab:
         st.markdown("#### 현재 점수 기준 지원 가능권역 보드")
