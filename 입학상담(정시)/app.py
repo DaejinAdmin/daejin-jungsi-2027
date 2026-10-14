@@ -1190,7 +1190,7 @@ if not db.empty and data_scale and result is not None:
     recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
 
     with recommendation_tab:
-        st.markdown("#### 현재 점수 기준 지원 가능권역 보드")
+        st.markdown("#### 현재 점수 기준 지원 가능 모집단위")
         st.caption(
             "분류 기준: 내 환산점수 ≥ 2026 평균 이상 → 안정 지원권 / "
             "2026 최저 이상~평균 미만 → 적정·경계권 / 2026 최저 미만 → 상향 도전권 (평균 대비 높은 순 정렬)"
