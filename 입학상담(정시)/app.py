@@ -521,34 +521,47 @@ with st.container(border=True):
         else DEPT_ORDER
     )
 
-    dept_col, info_col = st.columns([2, 1])
+    # [핵심 개편] 01번 섹션을 [학과 선택 : 2027 모집인원 : 계열 안내] 3단 구조로 배치
+    dept_col, quota_col, info_col = st.columns([5, 1.6, 3.4])
     with dept_col:
         selected_dept = st.selectbox(
             "모집단위", departments, key="selected_dept", on_change=invalidate_result
         )
+
+    record = None
+    if not db.empty:
+        matching = db[db["모집단위명"] == selected_dept]
+        if len(matching) >= 1:
+            record = matching.iloc[0]
+
+    quota_text = display_quota(get_quota_value(record))
+
+    with quota_col:
+        st.markdown(
+            f"""
+            <div style="font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.45;">2027 모집인원</div>
+            <div style="min-height: 44px; box-sizing: border-box; background-color: var(--tint); border-radius: 10px; padding: 8px 14px; color: var(--navy); font-weight: 850; font-size: 17px; display: flex; align-items: center; justify-content: center;">
+                {escape(quota_text)}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     with info_col:
         is_eng = selected_dept in ENG_DEPTS
         info_bg = "rgba(29, 63, 160, 0.08)" if is_eng else "rgba(5, 150, 105, 0.08)"
         info_border = "1px solid rgba(29, 63, 160, 0.2)" if is_eng else "1px solid rgba(5, 150, 105, 0.2)"
         info_color = "#1D3FA0" if is_eng else "#059669"
         info_text = "이공계열 · 수학 및 과학탐구 가산점 대상" if is_eng else "인문사회계열 · 별도 가산점 없음"
-        # [수정 1] 좌측 selectbox 라벨 높이(28px)를 보상하고 최소 높이(44px)를 맞춰 수평 정렬 일치
         st.markdown(
             f"""
-            <div style="margin-top: 28px; min-height: 44px; box-sizing: border-box; background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 10px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center;">
+            <div style="font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.45;">계열 및 가산점 안내</div>
+            <div style="min-height: 44px; box-sizing: border-box; background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 10px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center;">
                 {info_text}
             </div>
             """,
             unsafe_allow_html=True
         )
-
-    record = None
-    if not db.empty:
-        matching = db[db["모집단위명"] == selected_dept]
-        if len(matching) == 1:
-            record = matching.iloc[0]
-        elif len(matching) > 1:
-            record = matching.iloc[0]
 
 with st.container(border=True):
     title_col, reset_col = st.columns([5, 1])
@@ -639,7 +652,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역 6:4 비율 적용)
+# 7. 결과 출력 (03, 04번 영역 6:4 비율 유지)
 # ==================================================
 result = st.session_state.result
 
@@ -658,7 +671,6 @@ if result is None:
 
 history = build_history(record) if record is not None and data_scale else pd.DataFrame()
 
-# [수정 3] 03, 04번 영역 비율 6:4 적용
 result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
@@ -712,19 +724,16 @@ with comparison_col:
             max_score = to_number(recent["최고"])
             avg_score = to_number(recent["평균"])
             cut_score = to_number(recent["최저"])
-            quota_val = get_quota_value(record)
 
-            # [수정 2] 우측 공란에 올해(2027) 모집인원 메트릭 추가 (4열 구성)
-            m_cols = st.columns(4)
+            # 04번 영역은 다시 깔끔하게 3열 점수 비교에 집중
+            m_cols = st.columns(3)
             for col, lbl, val in zip(
-                m_cols[:3],
+                m_cols,
                 ["2026 최고점", "2026 평균점", "2026 최저점"],
                 [max_score, avg_score, cut_score],
             ):
                 with col:
                     st.metric(lbl, display_number(val))
-            with m_cols[3]:
-                st.metric("2027 모집인원", display_quota(quota_val))
 
             valid_history = all(
                 v is not None and 0 <= v <= 1000
@@ -793,10 +802,9 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역 비율 6:4 적용)
+# 8. 결과 출력 (05, 06번 영역 비율 6:4 유지)
 # ==================================================
 if not history.empty:
-    # [수정 3] 05, 06번 영역 비율 6:4 적용
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
@@ -1038,6 +1046,7 @@ if not db.empty and data_scale and result is not None:
 
         return {
             "모집단위": dept_name,
+            "모집인원": display_quota(get_quota_value(dept_record)),
             "현재 환산점수": dept_score["score"],
             "분류": recommendation,
             "2026 최고": recent_max,
@@ -1071,6 +1080,7 @@ if not db.empty and data_scale and result is not None:
             recommendation_rows.append({
                 "분류": item["분류"],
                 "모집단위": item["모집단위"],
+                "모집인원": item["모집인원"],
                 "내 환산점수": item["현재 환산점수"],
                 "2026 평균": item["2026 평균"],
                 "평균 대비": item["평균 대비"],
@@ -1133,6 +1143,7 @@ if not db.empty and data_scale and result is not None:
 
         if compare_depts:
             metrics = [
+                ("2027 모집인원", None, "quota"),
                 ("현재 환산점수", None, "current"),
                 ("2026학년도", "2026", "year"),
                 (" 최고", ("2026", "최고"), "metric"),
@@ -1158,7 +1169,9 @@ if not db.empty and data_scale and result is not None:
                 for dept_name in compare_depts:
                     item = analysis_by_dept[dept_name]
 
-                    if row_type == "current":
+                    if row_type == "quota":
+                        value = item["모집인원"]
+                    elif row_type == "current":
                         value = f"{item['현재 환산점수']:.2f}"
                     elif row_type == "year":
                         yr_status = item["연도별"].get(metric_key, {}).get("판정", "")
@@ -1192,7 +1205,7 @@ if not db.empty and data_scale and result is not None:
                             styles.append(base_style + " color: #DC2626;")
                         else:
                             styles.append(base_style + " color: #17365D;")
-                    elif row_type == "current":
+                    elif row_type in ("current", "quota"):
                         styles.append("background-color: #F4F7FB; font-weight: bold; color: #082070;")
                     else:
                         styles.append("")
