@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인
+# 2. 디자인 (모던 카드 & 뱃지 대시보드 CSS 포함)
 # ==================================================
 st.markdown(
     """
@@ -207,7 +207,7 @@ st.markdown(
         color: #C3CEEA; font-size: 14px; line-height: 1.7;
     }
 
-    .status { border-radius: 14px; padding: 16px 20px; margin: 8px 0 16px; font-size: 16px; font-weight: 800; line-height: 1.6; }
+    .status { border-radius: 14px; padding: 14px 18px; margin: 8px 0 14px; font-size: 15.5px; font-weight: 800; line-height: 1.55; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
@@ -217,10 +217,102 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    [data-testid="stDataFrame"] {
-        border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
-        background: #FFFFFF; width: 100% !important;
+    /* ==================================================
+       모던 대시보드 커스텀 카드 & 뱃지 스타일 (04, 06, 07번용)
+       ================================================== */
+    /* 04번: 수평 비교 스트립 */
+    .cmp-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .cmp-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 11px 16px; background: #F8FAFE; border: 1px solid var(--line);
+        border-radius: 12px; transition: all 0.15s ease;
     }
+    .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
+    .cmp-lbl { font-size: 14px; font-weight: 700; color: var(--muted); }
+    .cmp-val-group { display: flex; align-items: center; gap: 12px; }
+    .cmp-score { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .pill-badge {
+        padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 800;
+        font-variant-numeric: tabular-nums; display: inline-flex; align-items: center;
+    }
+    .pill-plus { background: rgba(29, 63, 160, 0.10); color: #1D3FA0; border: 1px solid rgba(29, 63, 160, 0.22); }
+    .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
+    .pill-same { background: #E9EDF8; color: var(--navy); }
+
+    /* 06번: 3개년 입시 결과 요약 카드 */
+    .yr-card-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .yr-card {
+        background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
+        border-radius: 12px; padding: 14px 16px; transition: all 0.15s ease;
+    }
+    .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+    .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
+    .yr-tags { display: flex; gap: 6px; }
+    .yr-tag {
+        font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+        background: #FFFFFF; border: 1px solid var(--line); color: var(--muted);
+    }
+    .yr-tag b { color: var(--navy); font-weight: 800; }
+    .yr-metrics {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 9px; padding: 9px 12px; text-align: center;
+    }
+    .yr-m-lbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+    .yr-m-val { font-size: 15px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+
+    /* 07-①번: 3단 칸반 보드 */
+    .kb-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 16px;
+    }
+    .kb-safe { background: rgba(5, 150, 105, 0.10); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); }
+    .kb-fit { background: rgba(220, 38, 38, 0.10); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); }
+    .kb-up { background: rgba(29, 78, 216, 0.10); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); }
+    .kb-cnt {
+        background: #FFFFFF; padding: 2px 10px; border-radius: 999px; font-size: 13px;
+        font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .kb-card {
+        background: #FFFFFF; border: 1px solid var(--line); border-radius: 12px;
+        padding: 14px 16px; margin-bottom: 10px; transition: all 0.15s ease;
+    }
+    .kb-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(8, 32, 112, 0.08); transform: translateY(-1px); }
+    .kb-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .kb-dept { font-size: 15.5px; font-weight: 850; color: var(--navy); }
+    .kb-quota { font-size: 11.5px; font-weight: 700; color: var(--muted); background: var(--bg); padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+    .kb-scores {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 12.5px; color: var(--muted); background: #F8FAFE; padding: 7px 10px; border-radius: 8px; margin-bottom: 8px;
+    }
+    .kb-scores b { color: var(--navy); font-weight: 800; }
+    .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; }
+
+    /* 07-②번: 모집단위 스펙 비교 플랫 카드 */
+    .spec-card {
+        background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px;
+        overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px;
+    }
+    .spec-top {
+        background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+        color: #FFFFFF; padding: 18px 16px; text-align: center;
+    }
+    .spec-dept { font-size: 17px; font-weight: 850; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .spec-quota {
+        display: inline-block; font-size: 12px; font-weight: 700; color: #C3CEEA;
+        background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 999px; margin-bottom: 12px;
+    }
+    .spec-my-lbl { font-size: 11.5px; color: #C3CEEA; font-weight: 600; }
+    .spec-my-val { font-size: 26px; font-weight: 900; color: #FFFFFF; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
+    .spec-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFE; }
+    .spec-yr-box { background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+    .spec-yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .spec-yr-name { font-size: 13.5px; font-weight: 800; color: var(--navy); }
+    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
+    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
+    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
+    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700; }
+
     [data-testid="stAlert"] { border-radius: 10px; }
 
     @media (max-width: 900px) {
@@ -502,7 +594,7 @@ st.markdown(
     """
     <div class="rule-strip">
         <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>02 &nbsp; 차 순위 영역 40%</strong>60%에 반영하지 않은 국·수·영, 탐구, 한국사 중 상위 1영역</div>
+        <div class="rule-item"><strong>02 &nbsp; 차 순위 영역 40%</strong>60%에 반영하지 않은 국·수·영, 탐구 상위 1과목, 한국사 중 최고</div>
         <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
     </div>
     """,
@@ -521,7 +613,6 @@ with st.container(border=True):
         else DEPT_ORDER
     )
 
-    # [핵심 개편] 01번 섹션을 [학과 선택 : 2027 모집인원 : 계열 안내] 3단 구조로 배치
     dept_col, quota_col, info_col = st.columns([5, 1.6, 3.4])
     with dept_col:
         selected_dept = st.selectbox(
@@ -652,7 +743,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역 6:4 비율 유지)
+# 7. 결과 출력 (03, 04번 영역 6:4 비율 + 모던 비교 바)
 # ==================================================
 result = st.session_state.result
 
@@ -703,13 +794,27 @@ with result_col:
             st.caption(f"{second_score:.2f} × 40%")
 
         with st.expander("산출 근거 자세히 보기"):
-            detail = pd.DataFrame({
-                "반영 영역": [first_name, second_name],
-                "가산·등급 환산 후 점수": [f"{first_score:.2f}", f"{second_score:.2f}"],
-                "반영 비율": ["60%", "40%"],
-                "반영 점수": [f"{first_score * 0.6:.2f}", f"{second_score * 0.4:.2f}"],
-            })
-            st.dataframe(detail, hide_index=True, use_container_width=True)
+            st.markdown(
+                f"""
+                <div class="cmp-list">
+                    <div class="cmp-row">
+                        <span class="cmp-lbl">60% 반영 ({escape(first_name)})</span>
+                        <div class="cmp-val-group">
+                            <span style="font-size:13px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
+                            <span class="cmp-score">{first_score * 0.6:.2f}점</span>
+                        </div>
+                    </div>
+                    <div class="cmp-row">
+                        <span class="cmp-lbl">40% 반영 ({escape(second_name)})</span>
+                        <div class="cmp-val-group">
+                            <span style="font-size:13px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
+                            <span class="cmp-score">{second_score * 0.4:.2f}점</span>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 with comparison_col:
     with st.container(border=True):
@@ -725,7 +830,6 @@ with comparison_col:
             avg_score = to_number(recent["평균"])
             cut_score = to_number(recent["최저"])
 
-            # 04번 영역은 다시 깔끔하게 3열 점수 비교에 집중
             m_cols = st.columns(3)
             for col, lbl, val in zip(
                 m_cols,
@@ -757,7 +861,7 @@ with comparison_col:
                     f"""
                     <div class="status" style="background:{bg}; color:{c};">
                         {msg}<br>
-                        <span style="font-size:14px; font-weight:700;">
+                        <span style="font-size:13.5px; font-weight:700;">
                             전년도 평균 대비 {score - avg_score:+.2f}점
                         </span>
                     </div>
@@ -765,33 +869,27 @@ with comparison_col:
                     unsafe_allow_html=True,
                 )
 
-                def gap_text(target):
+                # [모던 UI 교체 1] 04번 표 대신 컬러 뱃지형 수평 비교 스트립 렌더링
+                strip_html = '<div class="cmp-list">'
+                for lbl, target in [("2026 최고점 기준", max_score), ("2026 평균점 기준", avg_score), ("2026 최저점 기준", cut_score)]:
                     diff = score - target
                     if abs(diff) < 0.005:
-                        return "동일"
-                    return f"{abs(diff):,.2f}점 {'초과' if diff > 0 else '부족'}"
+                        b_cls, b_txt = "pill-same", "동일 (0.00)"
+                    elif diff > 0:
+                        b_cls, b_txt = "pill-plus", f"+{diff:,.2f}점 초과"
+                    else:
+                        b_cls, b_txt = "pill-minus", f"-{abs(diff):,.2f}점 부족"
 
-                gap_table = pd.DataFrame({
-                    "비교 기준": ["2026 최고점", "2026 평균점", "2026 최저점"],
-                    "점수": [f"{v:,.2f}" for v in (max_score, avg_score, cut_score)],
-                    "내 점수와의 차이": [gap_text(v) for v in (max_score, avg_score, cut_score)],
-                })
-
-                def color_gap(val):
-                    val_str = str(val)
-                    if "부족" in val_str:
-                        return "color: #E11D48; font-weight: 800;"
-                    if "초과" in val_str:
-                        return "color: #1D3FA0; font-weight: 800;"
-                    return ""
-
-                styled_gap = gap_table.style
-                if hasattr(styled_gap, "map"):
-                    styled_gap = styled_gap.map(color_gap, subset=["내 점수와의 차이"])
-                else:
-                    styled_gap = styled_gap.applymap(color_gap, subset=["내 점수와의 차이"])
-
-                st.dataframe(styled_gap, hide_index=True, use_container_width=True)
+                    strip_html += (
+                        f'<div class="cmp-row">'
+                        f'<span class="cmp-lbl">{lbl}</span>'
+                        f'<div class="cmp-val-group">'
+                        f'<span class="cmp-score">{target:,.2f}점</span>'
+                        f'<span class="pill-badge {b_cls}">{b_txt}</span>'
+                        f'</div></div>'
+                    )
+                strip_html += '</div>'
+                st.markdown(strip_html, unsafe_allow_html=True)
 
             elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning(
@@ -802,7 +900,7 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역 비율 6:4 유지)
+# 8. 결과 출력 (05, 06번 영역 비율 6:4 + 연도별 요약 카드)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
@@ -967,21 +1065,38 @@ if not history.empty:
         with st.container(border=True):
             section_title("06", "3개년 입시 결과")
 
-            table = history.sort_values("연도", ascending=False).copy()
-            table["학년도"] = table["연도"] + "학년도"
-            table["경쟁률"] = table["경쟁률"].map(display_ratio)
-            table["추가합격"] = table["추가합격"].map(display_count)
-            for c in ("최고", "평균", "최저"):
-                table[c] = table[c].map(display_number)
+            # [모던 UI 교체 2] 06번 표 대신 연도별 타임라인 요약 카드 리스트 렌더링
+            sorted_hist = history.sort_values("연도", ascending=False)
+            cards_html = '<div class="yr-card-list">'
+            for _, h_row in sorted_hist.iterrows():
+                yr_label = f"{escape(str(h_row['연도']))}학년도"
+                mx_s = display_number(h_row["최고"])
+                av_s = display_number(h_row["평균"])
+                mn_s = display_number(h_row["최저"])
+                comp_s = escape(display_ratio(h_row["경쟁률"]))
+                add_s = escape(display_count(h_row["추가합격"]))
+                if add_s != "—" and not add_s.endswith("명"):
+                    add_s += "명"
 
-            st.dataframe(
-                table[["학년도", "최고", "평균", "최저", "경쟁률", "추가합격"]],
-                hide_index=True,
-                use_container_width=True,
-            )
+                cards_html += (
+                    f'<div class="yr-card">'
+                    f'<div class="yr-head">'
+                    f'<span class="yr-title">{yr_label}</span>'
+                    f'<div class="yr-tags">'
+                    f'<span class="yr-tag">경쟁률 <b>{comp_s}</b></span>'
+                    f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
+                    f'</div></div>'
+                    f'<div class="yr-metrics">'
+                    f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
+                    f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
+                    f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
+                    f'</div></div>'
+                )
+            cards_html += '</div>'
+            st.markdown(cards_html, unsafe_allow_html=True)
 
 # ==================================================
-# 9. 모집단위 추천 및 모집단위 비교
+# 9. 모집단위 추천(칸반 보드) 및 모집단위 비교(스펙 그리드)
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
@@ -1064,71 +1179,76 @@ if not db.empty and data_scale and result is not None:
         if analysis is not None:
             analysis_by_dept[dept_name] = analysis
 
-    recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
+    recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천 (칸반 보드)", "② 모집단위 비교 (스펙 카드)"])
 
     with recommendation_tab:
-        st.markdown("#### 현재 점수 기준 추천 목록")
+        st.markdown("#### 현재 점수 기준 지원 가능권역 보드")
         st.caption(
-            "분류 기준: 현재 점수 ≥ 2026 평균 이상 → 안정 / "
-            "2026 최저 이상~평균 미만 → 적정·경계 / 2026 최저 미만 → 상향"
+            "분류 기준: 내 환산점수 ≥ 2026 평균 이상 → 안정 지원권 / "
+            "2026 최저 이상~평균 미만 → 적정·경계권 / 2026 최저 미만 → 상향 도전권 (평균 대비 높은 순 정렬)"
         )
 
-        recommendation_rows = []
-        for item in analysis_by_dept.values():
-            if item["분류"] == "자료 확인 필요":
-                continue
-            recommendation_rows.append({
-                "분류": item["분류"],
-                "모집단위": item["모집단위"],
-                "모집인원": item["모집인원"],
-                "내 환산점수": item["현재 환산점수"],
-                "2026 평균": item["2026 평균"],
-                "평균 대비": item["평균 대비"],
-                "2026 최저": item["2026 최저"],
-                "최저 대비": item["최저 대비"],
-                "분류 근거": item["안내"],
-            })
+        valid_items = [item for item in analysis_by_dept.values() if item["분류"] != "자료 확인 필요"]
+        if valid_items:
+            # [모던 UI 교체 3] 07-①번 표 대신 3단 칸반 보드(안정 / 적정·경계 / 상향) 렌더링
+            kb_cols = st.columns(3, gap="medium")
+            categories = [
+                ("안정", "안정 지원권", "kb-safe", "#059669"),
+                ("적정·경계", "적정 · 경계권", "kb-fit", "#DC2626"),
+                ("상향", "상향 도전권", "kb-up", "#1D4ED8"),
+            ]
 
-        if recommendation_rows:
-            rec_df = pd.DataFrame(recommendation_rows)
-            rec_order = {"안정": 0, "적정·경계": 1, "상향": 2}
-            rec_df["_order"] = rec_df["분류"].map(rec_order)
-            rec_df = (
-                rec_df.sort_values(["_order", "평균 대비"], ascending=[True, False])
-                .drop(columns="_order")
-            )
+            for col, (cat_key, cat_title, head_cls, accent_color) in zip(kb_cols, categories):
+                cat_items = sorted(
+                    [it for it in valid_items if it["분류"] == cat_key],
+                    key=lambda x: (x["평균 대비"] if x["평균 대비"] is not None else -999),
+                    reverse=True,
+                )
+                with col:
+                    st.markdown(
+                        f'<div class="kb-header {head_cls}">'
+                        f'<span>{cat_title}</span>'
+                        f'<span class="kb-cnt">{len(cat_items)}개 학과</span>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    with st.container(height=450, border=True):
+                        if not cat_items:
+                            st.markdown(
+                                '<div style="text-align:center; padding:40px 10px; color:var(--muted); font-size:13.5px;">'
+                                '해당 권역에 속하는 모집단위가 없습니다.</div>',
+                                unsafe_allow_html=True,
+                            )
+                        else:
+                            cards_str = ""
+                            for it in cat_items:
+                                g_avg = it["평균 대비"]
+                                g_min = it["최저 대비"]
+                                avg_badge = f"평균 대비 {g_avg:+.2f}점" if g_avg is not None else "—"
+                                min_badge = f"최저 대비 {g_min:+.2f}점" if g_min is not None else "—"
 
-            def style_recommendation_cell(value):
-                value_text = str(value)
-                if value_text == "안정":
-                    return "color: #059669; font-weight: 800;"
-                if value_text == "적정·경계":
-                    return "color: #DC2626; font-weight: 800;"
-                if value_text == "상향":
-                    return "color: #1D4ED8; font-weight: 800;"
-                return ""
-
-            styled_rec = rec_df.style.format(
-                {
-                    "내 환산점수": "{:.2f}",
-                    "2026 평균": "{:.2f}",
-                    "평균 대비": "{:+.2f}",
-                    "2026 최저": "{:.2f}",
-                    "최저 대비": "{:+.2f}",
-                },
-                na_rep="—",
-            )
-            if hasattr(styled_rec, "map"):
-                styled_rec = styled_rec.map(style_recommendation_cell, subset=["분류"])
-            else:
-                styled_rec = styled_rec.applymap(style_recommendation_cell, subset=["분류"])
-
-            st.dataframe(styled_rec, hide_index=True, use_container_width=True, height=420)
+                                cards_str += (
+                                    f'<div class="kb-card">'
+                                    f'<div class="kb-card-top">'
+                                    f'<span class="kb-dept">{escape(it["모집단위"])}</span>'
+                                    f'<span class="kb-quota">모집 {escape(it["모집인원"])}</span>'
+                                    f'</div>'
+                                    f'<div class="kb-scores">'
+                                    f'<span>내 점수 <b>{it["현재 환산점수"]:.2f}</b></span>'
+                                    f'<span>26평균 <b>{display_number(it["2026 평균"])}</b></span>'
+                                    f'<span>26최저 <b>{display_number(it["2026 최저"])}</b></span>'
+                                    f'</div>'
+                                    f'<div class="kb-foot">'
+                                    f'<span style="color:{accent_color};">{avg_badge}</span>'
+                                    f'<span style="color:var(--muted);">{min_badge}</span>'
+                                    f'</div></div>'
+                                )
+                            st.markdown(cards_str, unsafe_allow_html=True)
         else:
             st.info("추천 분류에 필요한 2026학년도 입시 결과가 충분하지 않습니다.")
 
     with comparison_tab:
-        st.markdown("#### 모집단위별 점수·입결 비교")
+        st.markdown("#### 모집단위별 점수·입결 다이렉트 비교")
 
         compare_options = list(analysis_by_dept.keys())
         default_compare = [selected_dept] if selected_dept in compare_options else compare_options[:1]
@@ -1142,76 +1262,57 @@ if not db.empty and data_scale and result is not None:
         )
 
         if compare_depts:
-            metrics = [
-                ("2027 모집인원", None, "quota"),
-                ("현재 환산점수", None, "current"),
-                ("2026학년도", "2026", "year"),
-                (" 최고", ("2026", "최고"), "metric"),
-                (" 평균", ("2026", "평균"), "metric"),
-                (" 최저", ("2026", "최저"), "metric"),
-                ("2025학년도", "2025", "year"),
-                (" 최고", ("2025", "최고"), "metric"),
-                (" 평균", ("2025", "평균"), "metric"),
-                (" 최저", ("2025", "최저"), "metric"),
-                ("2024학년도", "2024", "year"),
-                (" 최고", ("2024", "최고"), "metric"),
-                (" 평균", ("2024", "평균"), "metric"),
-                (" 최저", ("2024", "최저"), "metric"),
-            ]
+            # [모던 UI 교체 4] 07-②번 표 대신 학과별 스펙 비교 플랫 카드 그리드 렌더링
+            spec_cols = st.columns(len(compare_depts), gap="medium")
+            for s_col, dept_name in zip(spec_cols, compare_depts):
+                item = analysis_by_dept[dept_name]
+                with s_col:
+                    card_html = (
+                        f'<div class="spec-card">'
+                        f'<div class="spec-top">'
+                        f'<div class="spec-dept">{escape(dept_name)}</div>'
+                        f'<div class="spec-quota">2027 모집인원 · {escape(item["모집인원"])}</div>'
+                        f'<div class="spec-my-lbl">현재 내 환산점수</div>'
+                        f'<div class="spec-my-val">{item["현재 환산점수"]:.2f}<span style="font-size:14px; font-weight:600; color:#C3CEEA;"> 점</span></div>'
+                        f'</div>'
+                        f'<div class="spec-body">'
+                    )
 
-            row_types = []
-            compare_rows = []
-
-            for metric_label, metric_key, row_type in metrics:
-                row = {"비교 항목": metric_label}
-                row_types.append(row_type)
-
-                for dept_name in compare_depts:
-                    item = analysis_by_dept[dept_name]
-
-                    if row_type == "quota":
-                        value = item["모집인원"]
-                    elif row_type == "current":
-                        value = f"{item['현재 환산점수']:.2f}"
-                    elif row_type == "year":
-                        yr_status = item["연도별"].get(metric_key, {}).get("판정", "")
-                        value = f"[{yr_status}]" if yr_status and yr_status != "자료 없음" else ""
-                    else:
-                        year, label = metric_key
-                        raw = item["연도별"].get(year, {}).get(label)
-                        value = f"{raw:.2f}" if raw is not None else "—"
-
-                    row[dept_name] = value
-
-                compare_rows.append(row)
-
-            compare_df = pd.DataFrame(compare_rows)
-
-            def style_comparison_rows(row):
-                row_type = row_types[row.name]
-                styles = []
-                for val in row:
-                    val_str = str(val)
-                    if row_type == "year":
-                        base_style = (
-                            "background-color: #E8EEF8; font-weight: bold; "
-                            "border-top: 2px solid #9DB2D1;"
-                        )
-                        if "[상향]" in val_str:
-                            styles.append(base_style + " color: #1D4ED8;")
-                        elif "[안정]" in val_str:
-                            styles.append(base_style + " color: #059669;")
-                        elif "[적정·경계]" in val_str:
-                            styles.append(base_style + " color: #DC2626;")
+                    for yr in ("2026", "2025", "2024"):
+                        yr_info = item["연도별"].get(yr, {})
+                        st_txt = yr_info.get("판정", "자료 없음")
+                        if st_txt == "안정":
+                            b_cls = "bdg-safe"
+                        elif st_txt == "적정·경계":
+                            b_cls = "bdg-fit"
+                        elif st_txt == "상향":
+                            b_cls = "bdg-up"
                         else:
-                            styles.append(base_style + " color: #17365D;")
-                    elif row_type in ("current", "quota"):
-                        styles.append("background-color: #F4F7FB; font-weight: bold; color: #082070;")
-                    else:
-                        styles.append("")
-                return styles
+                            b_cls = "bdg-none"
 
-            styled_compare_df = compare_df.style.apply(style_comparison_rows, axis=1)
-            st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
+                        mx_v = display_number(yr_info.get("최고"))
+                        av_v = display_number(yr_info.get("평균"))
+                        mn_v = display_number(yr_info.get("최저"))
+
+                        card_html += (
+                            f'<div class="spec-yr-box">'
+                            f'<div class="spec-yr-head">'
+                            f'<span class="spec-yr-name">{yr}학년도</span>'
+                            f'<span class="{b_cls}">{escape(st_txt)}</span>'
+                            f'</div>'
+                            f'<div class="yr-metrics">'
+                            f'<div><div class="yr-m-lbl">최고</div><div class="yr-m-val" style="color:#3157C8; font-size:14px;">{mx_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">평균</div><div class="yr-m-val" style="font-size:14px;">{av_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">최저</div><div class="yr-m-val" style="color:#087F75; font-size:14px;">{mn_v}</div></div>'
+                            f'</div></div>'
+                        )
+
+                    card_html += '</div></div>'
+                    st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
