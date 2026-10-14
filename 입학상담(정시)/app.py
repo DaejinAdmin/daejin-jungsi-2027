@@ -479,7 +479,7 @@ def build_history(record):
 # ==================================================
 # 6. 헤더 및 입력 영역
 # ==================================================
-head_c1, head_c2 = st.columns([0.8, 9.2])
+head_c1, head_c2 = st.columns([1.0, 9.2])
 
 with head_c1:
     logo_png = BASE_DIR / "logo.png"
