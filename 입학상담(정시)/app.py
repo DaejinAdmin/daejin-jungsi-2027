@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (모던 카드 & 뱃지 대시보드 CSS 포함)
+# 2. 디자인 (좌우 박스 높이 100% 동기화 및 여백 보정)
 # ==================================================
 st.markdown(
     """
@@ -92,13 +92,21 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
-    div[data-testid="column"] > div { height: 100%; }
-    div[data-testid="stVerticalBlockBorderWrapper"] { height: 100%; }
-
-    [data-testid="stVerticalBlockBorderWrapper"] {
+    /* [핵심 수정] 좌우 컬럼(03-04, 05-06)의 외곽 흰색 박스 높이를 완벽히 동일하게 맞춤 */
+    div[data-testid="stHorizontalBlock"] { align-items: stretch !important; }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        min-width: 0; display: flex; flex-direction: column;
+    }
+    div[data-testid="column"] > div {
+        flex: 1; display: flex; flex-direction: column; height: 100%;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        flex: 1; display: flex; flex-direction: column; height: 100%;
         background: #FFFFFF; border: 1px solid var(--line) !important; border-radius: 14px !important;
         box-shadow: 0 2px 8px rgba(8, 32, 112, 0.055);
+        padding-bottom: 6px !important;
     }
+
     [data-testid="stImage"] img {
         background: #FFFFFF; padding: 6px; border-radius: 14px;
         border: 1px solid var(--line); box-shadow: 0 4px 12px -4px rgba(8, 32, 112, 0.15);
@@ -188,7 +196,7 @@ st.markdown(
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 20px; padding: 30px; color: #FFFFFF; margin-bottom: 20px;
+        border-radius: 20px; padding: 28px 30px; color: #FFFFFF; margin-bottom: 18px;
         box-shadow: 0 12px 24px rgba(8, 32, 112, 0.22);
     }
     .score-hero::after {
@@ -197,69 +205,66 @@ st.markdown(
     }
     .score-label { font-size: 15px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(42px, 4.5vw, 68px); font-weight: 900; letter-spacing: -2px;
-        line-height: 1.2; margin: 10px 0; font-variant-numeric: tabular-nums;
+        font-size: clamp(42px, 4.5vw, 66px); font-weight: 900; letter-spacing: -2px;
+        line-height: 1.2; margin: 8px 0; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .score-number small { font-size: 20px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 16px;
-        color: #C3CEEA; font-size: 14px; line-height: 1.7;
+        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 14px;
+        color: #C3CEEA; font-size: 14px; line-height: 1.65;
     }
 
-    .status { border-radius: 14px; padding: 14px 18px; margin: 8px 0 14px; font-size: 15.5px; font-weight: 800; line-height: 1.55; }
+    .status { border-radius: 14px; padding: 15px 18px; margin: 10px 0 14px; font-size: 15.5px; font-weight: 800; line-height: 1.55; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
     }
     .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
 
-    div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
-
     /* ==================================================
-       모던 대시보드 커스텀 카드 & 뱃지 스타일 (04, 06, 07번용)
+       모던 대시보드 커스텀 카드 & 뱃지 스타일 (높이 밸런스 보정)
        ================================================== */
-    /* 04번: 수평 비교 스트립 */
-    .cmp-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    /* 04번: 수평 비교 스트립 (03번 높이에 맞춰 여유 있게 확장 및 하단 여백 확보) */
+    .cmp-list { display: flex; flex-direction: column; gap: 11px; margin-top: 8px; padding-bottom: 6px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 11px 16px; background: #F8FAFE; border: 1px solid var(--line);
+        padding: 14px 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
-    .cmp-lbl { font-size: 14px; font-weight: 700; color: var(--muted); }
+    .cmp-lbl { font-size: 14.5px; font-weight: 700; color: var(--muted); }
     .cmp-val-group { display: flex; align-items: center; gap: 12px; }
-    .cmp-score { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .cmp-score { font-size: 17px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
     .pill-badge {
-        padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 800;
+        padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 800;
         font-variant-numeric: tabular-nums; display: inline-flex; align-items: center;
     }
     .pill-plus { background: rgba(29, 63, 160, 0.10); color: #1D3FA0; border: 1px solid rgba(29, 63, 160, 0.22); }
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번: 3개년 입시 결과 요약 카드 */
-    .yr-card-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    /* 06번: 3개년 입시 결과 요약 카드 (05번 차트 높이에 딱 맞게 슬림화 및 하단 잘림 방지) */
+    .yr-card-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; padding-bottom: 6px; }
     .yr-card {
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 14px 16px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 10px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
-    .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; flex-wrap: wrap; gap: 6px; }
+    .yr-title { font-size: 15px; font-weight: 850; color: var(--navy); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
-        font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+        font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
         background: #FFFFFF; border: 1px solid var(--line); color: var(--muted);
     }
     .yr-tag b { color: var(--navy); font-weight: 800; }
     .yr-metrics {
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 9px; padding: 9px 12px; text-align: center;
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 7px 10px; text-align: center;
     }
-    .yr-m-lbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
-    .yr-m-val { font-size: 15px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .yr-m-lbl { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 1px; }
+    .yr-m-val { font-size: 14.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
 
     /* 07-①번: 3단 칸반 보드 */
     .kb-header {
@@ -291,7 +296,7 @@ st.markdown(
     /* 07-②번: 모집단위 스펙 비교 플랫 카드 */
     .spec-card {
         background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px;
-        overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px;
+        overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px; margin-bottom: 8px;
     }
     .spec-top {
         background: linear-gradient(135deg, var(--navy-deep), var(--navy));
@@ -594,7 +599,7 @@ st.markdown(
     """
     <div class="rule-strip">
         <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>02 &nbsp; 차 순위 영역 40%</strong>60%에 반영하지 않은 국·수·영, 탐구 상위 1과목, 한국사 중 최고</div>
+        <div class="rule-item"><strong>02 &nbsp; 차 순위 영역 40%</strong>60%에 반영하지 않은 국·수·영, 탐구 1과목, 한국사 중 상위 영역</div>
         <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
     </div>
     """,
@@ -743,7 +748,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역 6:4 비율 + 모던 비교 바)
+# 7. 결과 출력 (03, 04번 영역 6:4 비율 + 높이 완전 동기화)
 # ==================================================
 result = st.session_state.result
 
@@ -869,7 +874,6 @@ with comparison_col:
                     unsafe_allow_html=True,
                 )
 
-                # [모던 UI 교체 1] 04번 표 대신 컬러 뱃지형 수평 비교 스트립 렌더링
                 strip_html = '<div class="cmp-list">'
                 for lbl, target in [("2026 최고점 기준", max_score), ("2026 평균점 기준", avg_score), ("2026 최저점 기준", cut_score)]:
                     diff = score - target
@@ -900,7 +904,7 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역 비율 6:4 + 연도별 요약 카드)
+# 8. 결과 출력 (05, 06번 영역 비율 6:4 + 높이 완전 동기화)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
@@ -1039,8 +1043,8 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=330,
-                        padding={"left": 8, "right": 24, "top": 14, "bottom": 4},
+                        height=300,
+                        padding={"left": 8, "right": 24, "top": 12, "bottom": 4},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
@@ -1052,7 +1056,7 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12px;line-height:1.6;'>"
+                    "<div style='width:100%;text-align:center;margin-top:0px;padding-bottom:4px;font-size:12px;line-height:1.5;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
@@ -1065,7 +1069,6 @@ if not history.empty:
         with st.container(border=True):
             section_title("06", "3개년 입시 결과")
 
-            # [모던 UI 교체 2] 06번 표 대신 연도별 타임라인 요약 카드 리스트 렌더링
             sorted_hist = history.sort_values("연도", ascending=False)
             cards_html = '<div class="yr-card-list">'
             for _, h_row in sorted_hist.iterrows():
@@ -1190,7 +1193,6 @@ if not db.empty and data_scale and result is not None:
 
         valid_items = [item for item in analysis_by_dept.values() if item["분류"] != "자료 확인 필요"]
         if valid_items:
-            # [모던 UI 교체 3] 07-①번 표 대신 3단 칸반 보드(안정 / 적정·경계 / 상향) 렌더링
             kb_cols = st.columns(3, gap="medium")
             categories = [
                 ("안정", "안정 지원권", "kb-safe", "#059669"),
@@ -1262,7 +1264,6 @@ if not db.empty and data_scale and result is not None:
         )
 
         if compare_depts:
-            # [모던 UI 교체 4] 07-②번 표 대신 학과별 스펙 비교 플랫 카드 그리드 렌더링
             spec_cols = st.columns(len(compare_depts), gap="medium")
             for s_col, dept_name in zip(spec_cols, compare_depts):
                 item = analysis_by_dept[dept_name]
@@ -1311,8 +1312,3 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
