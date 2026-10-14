@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (불안정한 CSS 트릭 제거 및 정밀 픽셀 매칭)
+# 2. 디자인 (틀 유지 + 04/06/07번 타이포그래피 확대)
 # ==================================================
 st.markdown(
     """
@@ -92,7 +92,6 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
-    /* 컨테이너 외곽 디자인 및 고정 높이 사용 시 내부 스크롤바 숨김 처리 */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: #FFFFFF;
         border: 1px solid var(--line) !important;
@@ -100,11 +99,11 @@ st.markdown(
         box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
     }
     [data-testid="stVerticalBlockBorderWrapper"] > div {
-        scrollbar-width: none; /* Firefox 스크롤바 숨김 */
-        -ms-overflow-style: none; /* IE/Edge 스크롤바 숨김 */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     [data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar {
-        display: none; /* Chrome/Safari 스크롤바 숨김 */
+        display: none;
     }
 
     [data-testid="stImage"] img {
@@ -156,11 +155,11 @@ st.markdown(
     }
 
     [data-testid="stMetricLabel"] p {
-        color: var(--muted) !important; font-size: 13px !important;
-        font-weight: 600 !important; line-height: 1.4 !important;
+        color: var(--muted) !important; font-size: 13.5px !important;
+        font-weight: 700 !important; line-height: 1.4 !important;
     }
     [data-testid="stMetricValue"] {
-        color: var(--navy) !important; font-size: clamp(21px, 2vw, 28px) !important;
+        color: var(--navy) !important; font-size: clamp(22px, 2.1vw, 29px) !important;
         font-weight: 850 !important; font-variant-numeric: tabular-nums;
     }
 
@@ -215,7 +214,7 @@ st.markdown(
         color: #C3CEEA; font-size: 13.5px; line-height: 1.6;
     }
 
-    .status { border-radius: 12px; padding: 14px 18px; margin: 8px 0 14px; font-size: 15px; font-weight: 800; line-height: 1.5; }
+    .status { border-radius: 12px; padding: 13px 18px; margin: 6px 0 12px; font-size: 16px; font-weight: 850; line-height: 1.5; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
@@ -226,59 +225,59 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
     /* ==================================================
-       모던 대시보드 카드 & 뱃지 (컨테이너 고정 높이에 맞춘 정밀 규격)
+       [폰트 확대 & 여백 압축] 04, 06, 07번 내부 텍스트 가독성 강화
        ================================================== */
-    /* 04번: 수평 비교 스트립 (495px 컨테이너 내부에서 하단 여백 20px 확보) */
-    .cmp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+    /* 04번: 수평 비교 스트립 (패딩은 줄이고 글씨는 1.5~2px 확대) */
+    .cmp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 15px 18px; background: #F8FAFE; border: 1px solid var(--line);
+        padding: 13px 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
-    .cmp-lbl { font-size: 14.5px; font-weight: 700; color: var(--muted); }
+    .cmp-lbl { font-size: 15.5px; font-weight: 750; color: var(--text); }
     .cmp-val-group { display: flex; align-items: center; gap: 12px; }
-    .cmp-score { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .cmp-score { font-size: 18.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
     .pill-badge {
-        padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 800;
+        padding: 5px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 800;
         font-variant-numeric: tabular-nums; display: inline-flex; align-items: center;
     }
     .pill-plus { background: rgba(29, 63, 160, 0.10); color: #1D3FA0; border: 1px solid rgba(29, 63, 160, 0.22); }
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번: 3개년 입시 결과 요약 카드 (430px 컨테이너 내부에 3개가 여유 있게 들어가도록 설계) */
-    .yr-card-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    /* 06번: 3개년 입시 결과 요약 카드 (430px 높이 안에서 글씨 최대 확대) */
+    .yr-card-list { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
     .yr-card {
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 10px 14px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 8px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
-    .yr-title { font-size: 14.5px; font-weight: 850; color: var(--navy); }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
+    .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
-        font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+        font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 6px;
         background: #FFFFFF; border: 1px solid var(--line); color: var(--muted);
     }
-    .yr-tag b { color: var(--navy); font-weight: 800; }
+    .yr-tag b { color: var(--navy); font-weight: 850; }
     .yr-metrics {
         display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
         background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 6px 10px; text-align: center;
     }
-    .yr-m-lbl { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 1px; }
-    .yr-m-val { font-size: 14px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .yr-m-lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px; }
+    .yr-m-val { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.25; }
 
-    /* 07-①번: 3단 칸반 보드 */
+    /* 07-①번: 3단 칸반 보드 (폰트 전반적 확대) */
     .kb-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 16px;
+        padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 17px;
     }
     .kb-safe { background: rgba(5, 150, 105, 0.10); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); }
     .kb-fit { background: rgba(220, 38, 38, 0.10); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); }
     .kb-up { background: rgba(29, 78, 216, 0.10); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); }
     .kb-cnt {
-        background: #FFFFFF; padding: 2px 10px; border-radius: 999px; font-size: 13px;
+        background: #FFFFFF; padding: 3px 11px; border-radius: 999px; font-size: 13.5px;
         font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .kb-card {
@@ -287,16 +286,16 @@ st.markdown(
     }
     .kb-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(8, 32, 112, 0.08); transform: translateY(-1px); }
     .kb-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-    .kb-dept { font-size: 15.5px; font-weight: 850; color: var(--navy); }
-    .kb-quota { font-size: 11.5px; font-weight: 700; color: var(--muted); background: var(--bg); padding: 3px 8px; border-radius: 6px; flex-shrink: 0; }
+    .kb-dept { font-size: 16.5px; font-weight: 850; color: var(--navy); }
+    .kb-quota { font-size: 12.5px; font-weight: 750; color: var(--muted); background: var(--bg); padding: 3px 9px; border-radius: 6px; flex-shrink: 0; }
     .kb-scores {
         display: flex; align-items: center; justify-content: space-between;
-        font-size: 12.5px; color: var(--muted); background: #F8FAFE; padding: 7px 10px; border-radius: 8px; margin-bottom: 8px;
+        font-size: 13.5px; color: var(--muted); background: #F8FAFE; padding: 8px 11px; border-radius: 8px; margin-bottom: 8px;
     }
-    .kb-scores b { color: var(--navy); font-weight: 800; }
-    .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; }
+    .kb-scores b { color: var(--navy); font-weight: 850; font-size: 14.5px; }
+    .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 800; }
 
-    /* 07-②번: 모집단위 스펙 비교 플랫 카드 */
+    /* 07-②번: 모집단위 스펙 비교 플랫 카드 (폰트 전반적 확대) */
     .spec-card {
         background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px;
         overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px; margin-bottom: 8px;
@@ -305,21 +304,21 @@ st.markdown(
         background: linear-gradient(135deg, var(--navy-deep), var(--navy));
         color: #FFFFFF; padding: 18px 16px; text-align: center;
     }
-    .spec-dept { font-size: 17px; font-weight: 850; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .spec-dept { font-size: 18.5px; font-weight: 850; margin-bottom: 6px; letter-spacing: -0.3px; }
     .spec-quota {
-        display: inline-block; font-size: 12px; font-weight: 700; color: #C3CEEA;
-        background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 999px; margin-bottom: 12px;
+        display: inline-block; font-size: 13px; font-weight: 700; color: #C3CEEA;
+        background: rgba(255,255,255,0.12); padding: 3px 11px; border-radius: 999px; margin-bottom: 12px;
     }
-    .spec-my-lbl { font-size: 11.5px; color: #C3CEEA; font-weight: 600; }
-    .spec-my-val { font-size: 26px; font-weight: 900; color: #FFFFFF; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
+    .spec-my-lbl { font-size: 12.5px; color: #C3CEEA; font-weight: 600; }
+    .spec-my-val { font-size: 28px; font-weight: 900; color: #FFFFFF; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
     .spec-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFE; }
-    .spec-yr-box { background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+    .spec-yr-box { background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
     .spec-yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .spec-yr-name { font-size: 13.5px; font-weight: 800; color: var(--navy); }
-    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700; }
+    .spec-yr-name { font-size: 15px; font-weight: 850; color: var(--navy); }
+    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; }
 
     [data-testid="stAlert"] { border-radius: 10px; }
 
@@ -751,7 +750,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역: height=495로 양쪽 물리적 높이 완벽 고정)
+# 7. 결과 출력 (03, 04번 영역: height=495 유지 + 폰트 확대)
 # ==================================================
 result = st.session_state.result
 
@@ -773,7 +772,6 @@ history = build_history(record) if record is not None and data_scale else pd.Dat
 result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
-    # [핵심 해결책] 03번과 04번 모두 height=495을 지정하여 양쪽 박스 높이를 1px 오차 없이 일치시킴
     with st.container(border=True, height=495):
         section_title("03", "환산 점수")
 
@@ -809,14 +807,14 @@ with result_col:
                     <div class="cmp-row" style="padding:10px 14px;">
                         <span class="cmp-lbl">60% 반영 ({escape(first_name)})</span>
                         <div class="cmp-val-group">
-                            <span style="font-size:13px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
+                            <span style="font-size:13.5px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
                             <span class="cmp-score">{first_score * 0.6:.2f}점</span>
                         </div>
                     </div>
                     <div class="cmp-row" style="padding:10px 14px;">
                         <span class="cmp-lbl">40% 반영 ({escape(second_name)})</span>
                         <div class="cmp-val-group">
-                            <span style="font-size:13px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
+                            <span style="font-size:13.5px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
                             <span class="cmp-score">{second_score * 0.4:.2f}점</span>
                         </div>
                     </div>
@@ -870,7 +868,7 @@ with comparison_col:
                     f"""
                     <div class="status" style="background:{bg}; color:{c};">
                         {msg}<br>
-                        <span style="font-size:13.5px; font-weight:700;">
+                        <span style="font-size:14.5px; font-weight:750;">
                             전년도 평균 대비 {score - avg_score:+.2f}점
                         </span>
                     </div>
@@ -908,13 +906,12 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역: height=430으로 양쪽 물리적 높이 완벽 고정)
+# 8. 결과 출력 (05, 06번 영역: height=430 유지 + 폰트 확대)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # [핵심 해결책] 05번과 06번 모두 height=430을 지정하여 양쪽 박스 높이를 완벽히 통일
         with st.container(border=True, height=430):
             section_title("05", "최근 3개년 점수 분포")
 
@@ -1061,7 +1058,7 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12px;line-height:1.5;'>"
+                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12.5px;line-height:1.5;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
@@ -1104,7 +1101,7 @@ if not history.empty:
             st.markdown(cards_html, unsafe_allow_html=True)
 
 # ==================================================
-# 9. 모집단위 추천 및 모집단위 비교
+# 9. 모집단위 추천 및 모집단위 비교 (타이포그래피 확대 적용)
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
@@ -1190,7 +1187,7 @@ if not db.empty and data_scale and result is not None:
     recommendation_tab, comparison_tab = st.tabs(["① 모집단위 추천", "② 모집단위 비교"])
 
     with recommendation_tab:
-        st.markdown("#### 현재 점수 기준 지원 가능 모집단위")
+        st.markdown("#### 현재 점수 기준 지원 가능권역 보드")
         st.caption(
             "분류 기준: 내 환산점수 ≥ 2026 평균 이상 → 안정 지원권 / "
             "2026 최저 이상~평균 미만 → 적정·경계권 / 2026 최저 미만 → 상향 도전권 (평균 대비 높은 순 정렬)"
@@ -1222,7 +1219,7 @@ if not db.empty and data_scale and result is not None:
                     with st.container(height=450, border=True):
                         if not cat_items:
                             st.markdown(
-                                '<div style="text-align:center; padding:40px 10px; color:var(--muted); font-size:13.5px;">'
+                                '<div style="text-align:center; padding:40px 10px; color:var(--muted); font-size:14px;">'
                                 '해당 권역에 속하는 모집단위가 없습니다.</div>',
                                 unsafe_allow_html=True,
                             )
@@ -1279,7 +1276,7 @@ if not db.empty and data_scale and result is not None:
                         f'<div class="spec-dept">{escape(dept_name)}</div>'
                         f'<div class="spec-quota">2027 모집인원 · {escape(item["모집인원"])}</div>'
                         f'<div class="spec-my-lbl">현재 내 환산점수</div>'
-                        f'<div class="spec-my-val">{item["현재 환산점수"]:.2f}<span style="font-size:14px; font-weight:600; color:#C3CEEA;"> 점</span></div>'
+                        f'<div class="spec-my-val">{item["현재 환산점수"]:.2f}<span style="font-size:15px; font-weight:600; color:#C3CEEA;"> 점</span></div>'
                         f'</div>'
                         f'<div class="spec-body">'
                     )
@@ -1300,6 +1297,7 @@ if not db.empty and data_scale and result is not None:
                         av_v = display_number(yr_info.get("평균"))
                         mn_v = display_number(yr_info.get("최저"))
 
+                        # 07-②번 내부에서 인라인으로 고정되어 있던 14px를 16px로 확대
                         card_html += (
                             f'<div class="spec-yr-box">'
                             f'<div class="spec-yr-head">'
@@ -1307,9 +1305,9 @@ if not db.empty and data_scale and result is not None:
                             f'<span class="{b_cls}">{escape(st_txt)}</span>'
                             f'</div>'
                             f'<div class="yr-metrics">'
-                            f'<div><div class="yr-m-lbl">최고</div><div class="yr-m-val" style="color:#3157C8; font-size:14px;">{mx_v}</div></div>'
-                            f'<div><div class="yr-m-lbl">평균</div><div class="yr-m-val" style="font-size:14px;">{av_v}</div></div>'
-                            f'<div><div class="yr-m-lbl">최저</div><div class="yr-m-val" style="color:#087F75; font-size:14px;">{mn_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">최고</div><div class="yr-m-val" style="color:#3157C8; font-size:16px;">{mx_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">평균</div><div class="yr-m-val" style="font-size:16px;">{av_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">최저</div><div class="yr-m-val" style="color:#087F75; font-size:16px;">{mn_v}</div></div>'
                             f'</div></div>'
                         )
 
@@ -1317,3 +1315,8 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
