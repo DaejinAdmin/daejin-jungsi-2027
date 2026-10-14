@@ -214,6 +214,9 @@ st.markdown(
     }
     .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
 
+    div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
+
     [data-testid="stDataFrame"] {
         border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
         background: #FFFFFF; width: 100% !important;
@@ -311,6 +314,20 @@ def display_count(value):
     if number is None:
         return display_text(value)
     return f"{int(number):,}" if number.is_integer() else f"{number:,.1f}"
+
+
+def display_quota(value):
+    if value is None or pd.isna(value):
+        return "—"
+    text = str(value).strip()
+    if not text or text == "-":
+        return "—"
+    if "명" in text:
+        return text
+    number = to_number(text)
+    if number is not None:
+        return f"{int(number):,}명" if number.is_integer() else f"{number:,.1f}명"
+    return text
 
 
 # ==================================================
@@ -431,6 +448,21 @@ def get_record_value(record, keywords):
     return None
 
 
+def get_quota_value(record):
+    if record is None:
+        return None
+    for kw_list in (["2027", "모집"], ["2027", "인원"], ["모집인원"], ["선발인원"], ["모집정원"], ["정원"], ["인원"]):
+        matches = [
+            c for c in record.index
+            if all(kw in str(c) for kw in kw_list)
+            and not any(yr in str(c) for yr in ("2024", "2025", "2026"))
+            and "모집단위" not in str(c)
+        ]
+        if matches and pd.notna(record[matches[0]]):
+            return record[matches[0]]
+    return None
+
+
 def build_history(record):
     rows, divisor = [], data_scale / 100
     for year in (2024, 2025, 2026):
@@ -500,9 +532,10 @@ with st.container(border=True):
         info_border = "1px solid rgba(29, 63, 160, 0.2)" if is_eng else "1px solid rgba(5, 150, 105, 0.2)"
         info_color = "#1D3FA0" if is_eng else "#059669"
         info_text = "이공계열 · 수학 및 과학탐구 가산점 대상" if is_eng else "인문사회계열 · 별도 가산점 없음"
+        # [수정 1] 좌측 selectbox 라벨 높이(28px)를 보상하고 최소 높이(44px)를 맞춰 수평 정렬 일치
         st.markdown(
             f"""
-            <div style="background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 12px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center; height: 100%;">
+            <div style="margin-top: 28px; min-height: 44px; box-sizing: border-box; background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 10px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center;">
                 {info_text}
             </div>
             """,
@@ -606,7 +639,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (50:50 균등 비율 적용)
+# 7. 결과 출력 (03, 04번 영역 6:4 비율 적용)
 # ==================================================
 result = st.session_state.result
 
@@ -625,8 +658,8 @@ if result is None:
 
 history = build_history(record) if record is not None and data_scale else pd.DataFrame()
 
-# 03, 04번 영역 비율 50:50 균등 정렬
-result_col, comparison_col = st.columns([1, 1], gap="large")
+# [수정 3] 03, 04번 영역 비율 6:4 적용
+result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
     with st.container(border=True):
@@ -679,15 +712,19 @@ with comparison_col:
             max_score = to_number(recent["최고"])
             avg_score = to_number(recent["평균"])
             cut_score = to_number(recent["최저"])
+            quota_val = get_quota_value(record)
 
-            m_cols = st.columns(3)
+            # [수정 2] 우측 공란에 올해(2027) 모집인원 메트릭 추가 (4열 구성)
+            m_cols = st.columns(4)
             for col, lbl, val in zip(
-                m_cols,
+                m_cols[:3],
                 ["2026 최고점", "2026 평균점", "2026 최저점"],
                 [max_score, avg_score, cut_score],
             ):
                 with col:
                     st.metric(lbl, display_number(val))
+            with m_cols[3]:
+                st.metric("2027 모집인원", display_quota(quota_val))
 
             valid_history = all(
                 v is not None and 0 <= v <= 1000
@@ -756,10 +793,11 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역 비율 50:50 균등 정렬)
+# 8. 결과 출력 (05, 06번 영역 비율 6:4 적용)
 # ==================================================
 if not history.empty:
-    chart_col, table_col = st.columns([1, 1], gap="large")
+    # [수정 3] 05, 06번 영역 비율 6:4 적용
+    chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
         with st.container(border=True):
@@ -1164,3 +1202,8 @@ if not db.empty and data_scale and result is not None:
             st.dataframe(styled_compare_df, hide_index=True, use_container_width=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
