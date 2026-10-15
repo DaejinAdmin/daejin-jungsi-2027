@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03/04 높이 유지 + 04 최고/최저 컬러 매칭 + 05/06 높이 대칭)
+# 2. 디자인 (03/04 높이 유지 + 04 최고/최저 컬러 매칭 + 05/06 밸런스 조정)
 # ==================================================
 st.markdown(
     """
@@ -124,22 +124,7 @@ st.markdown(
         margin-bottom: 16px;
     }
 
-    /* 05, 06번 마스터 카드 (높이 440px 고정 대칭으로 05/06 높이 완벽 일치) */
-    .master-card-056 {
-        background-color: #FFFFFF;
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 20px 22px;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
-        height: 440px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 16px;
-        overflow: hidden;
-    }
-
-    /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
+    /* 04번 상단 3열 최고/평균/최저 메트릭 */
     .top3-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -354,7 +339,7 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] { align-items: stretch; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* 06번 3개년 요약 카드 (05번 차트 박스와 440px 높이 완벽 일치) */
+    /* 06번 3개년 요약 카드 순수 고정 높이 */
     .yr-card-list {
         flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 2px;
     }
@@ -914,7 +899,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번: 565px 고정 대칭 유지)
+# 7. 결과 출력 (03, 04번: 고정 565px 일치)
 # ==================================================
 result = st.session_state.result
 
@@ -1057,7 +1042,6 @@ with comparison_col:
                 )
             strip_html += '</div>'
 
-            # [핵심 수정] 04번 최고점(top3-max), 평균점(top3-avg), 최저점(top3-min)에 파란색 및 초록색 컬러 타이포 적용
             st.markdown(
                 f"""
                 <div class="master-card">
@@ -1092,16 +1076,19 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역: master-card-056으로 높이 440px 완벽 대칭 동기화)
+# 8. 결과 출력 (05번 높이 440px 고정으로 06번과 완벽 대칭 동기화)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # [핵심 수정] 05번도 06번과 동일한 .master-card-056(높이 440px 고정)으로 감싸 양쪽 바닥선을 완벽히 일치시킴
+        # [핵심 수정] 05번을 06번과 동일한 .master-card-056(높이 440px)으로 렌더링하고 차트 높이를 245px로 최적화
         with st.container(border=True):
             st.markdown(
-                '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
+                f"""
+                <div class="master-card-056">
+                    <div class="section-title"><span class="step">05</span>최근 3개년 점수 분포</div>
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -1158,7 +1145,7 @@ if not history.empty:
                             titleFontSize=12,
                             titleFontWeight=600,
                             titleColor="#64708A",
-                            titlePadding=14,
+                            titlePadding=10,
                             labelFontSize=11,
                             labelColor="#64708A",
                             tickCount=6,
@@ -1235,8 +1222,8 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=280,
-                        padding={"left": 8, "right": 24, "top": 10, "bottom": 2},
+                        height=245,
+                        padding={"left": 8, "right": 24, "top": 4, "bottom": 0},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
@@ -1248,11 +1235,12 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:0px;font-size:12.5px;line-height:1.4;'>"
+                    "<div style='width:100%;text-align:center;margin-top:0px;font-size:12px;line-height:1.3;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
                     "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
+                    "</div>"
                     "</div>",
                     unsafe_allow_html=True,
                 )
