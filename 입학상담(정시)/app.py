@@ -1235,7 +1235,7 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=280,
+                        height=325,
                         padding={"left": 8, "right": 24, "top": 10, "bottom": 2},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
