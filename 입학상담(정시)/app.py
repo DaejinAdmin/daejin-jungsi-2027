@@ -125,19 +125,19 @@ st.markdown(
     }
 
     /* 05, 06번 마스터 카드 (높이 440px 고정 대칭으로 05/06 높이 완벽 일치) */
-.master-card-056 {
-    background-color: #FFFFFF;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 20px 22px;
-    box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
-    height: 440px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 16px;
-    /* overflow: hidden;  ← 이 줄을 제거하거나 주석 처리 */
-}
+    .master-card-056 {
+        background-color: #FFFFFF;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 22px;
+        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        height: 440px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
 
     /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
     .top3-grid {
@@ -1098,172 +1098,164 @@ if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # [변경] 05번도 .master-card-056(높이 440px 고정)으로 감싸서 06번과 높이 일치
-        st.markdown(
-            """
-            <div class="master-card-056">
-                <div class="section-title"><span class="step">05</span>최근 3개년 점수 분포</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        c_data = history[["연도", "최고", "평균", "최저"]].copy()
-
-        if c_data[["최고", "평균", "최저"]].notna().any().any():
-            chart_values = [
-                value
-                for value in c_data[["최고", "평균", "최저"]].to_numpy().ravel().tolist()
-                if pd.notna(value)
-            ]
-            chart_values.append(float(result["score"]))
-
-            x_min, x_max = min(chart_values), max(chart_values)
-            pad = max((x_max - x_min) * 0.12, 1.0)
-            domain_min = max(0, x_min - pad)
-            domain_max = min(100, x_max + pad)
-            if domain_max - domain_min < 2:
-                domain_min = max(0, domain_min - 1)
-                domain_max = min(100, domain_max + 1)
-
-            chart_data = c_data.copy()
-            chart_data["연도"] = chart_data["연도"].astype(str)
-
-            y_encoding = alt.Y(
-                "연도:N",
-                title=None,
-                sort=["2026", "2025", "2024"],
-                axis=alt.Axis(
-                    labelAngle=0,
-                    labelFontSize=13,
-                    labelFontWeight=700,
-                    labelColor="#34415E",
-                    ticks=False,
-                    domain=False,
-                    grid=True,
-                    gridColor="#EEF1F7",
-                    gridWidth=1,
-                ),
+        # [핵심 수정] 05번도 06번과 동일한 .master-card-056(높이 440px 고정)으로 감싸 양쪽 바닥선을 완벽히 일치시킴
+        with st.container(border=True):
+            st.markdown(
+                '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
+                unsafe_allow_html=True,
             )
 
-            base = alt.Chart(chart_data).encode(y=y_encoding)
+            c_data = history[["연도", "최고", "평균", "최저"]].copy()
 
-            x_scale = alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False)
+            if c_data[["최고", "평균", "최저"]].notna().any().any():
+                chart_values = [
+                    value
+                    for value in c_data[["최고", "평균", "최저"]].to_numpy().ravel().tolist()
+                    if pd.notna(value)
+                ]
+                chart_values.append(float(result["score"]))
 
-            range_rule = base.mark_rule(
-                color="#CBD5E5", strokeWidth=5, strokeCap="round"
-            ).encode(
-                x=alt.X(
-                    "최저:Q",
-                    title="환산점수 · 100점 기준",
-                    scale=x_scale,
+                x_min, x_max = min(chart_values), max(chart_values)
+                pad = max((x_max - x_min) * 0.12, 1.0)
+                domain_min = max(0, x_min - pad)
+                domain_max = min(100, x_max + pad)
+                if domain_max - domain_min < 2:
+                    domain_min = max(0, domain_min - 1)
+                    domain_max = min(100, domain_max + 1)
+
+                chart_data = c_data.copy()
+                chart_data["연도"] = chart_data["연도"].astype(str)
+
+                y_encoding = alt.Y(
+                    "연도:N",
+                    title=None,
+                    sort=["2026", "2025", "2024"],
                     axis=alt.Axis(
-                        titleFontSize=12,
-                        titleFontWeight=600,
-                        titleColor="#64708A",
-                        titlePadding=14,
-                        labelFontSize=11,
-                        labelColor="#64708A",
-                        tickCount=6,
-                        grid=True,
-                        gridColor="#E9EDF5",
-                        gridDash=[2, 3],
+                        labelAngle=0,
+                        labelFontSize=13,
+                        labelFontWeight=700,
+                        labelColor="#34415E",
+                        ticks=False,
                         domain=False,
-                        tickSize=0,
-                        format=".1f",
+                        grid=True,
+                        gridColor="#EEF1F7",
+                        gridWidth=1,
                     ),
-                ),
-                x2="최고:Q",
-                tooltip=[
-                    alt.Tooltip("연도:N", title="학년도"),
-                    alt.Tooltip("최고:Q", format=".2f", title="최고점"),
-                    alt.Tooltip("평균:Q", format=".2f", title="평균점"),
-                    alt.Tooltip("최저:Q", format=".2f", title="최저점"),
-                ],
-            )
-
-            min_point = base.mark_point(
-                filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
-            ).encode(
-                x=alt.X("최저:Q", scale=x_scale, axis=None),
-                tooltip=[
-                    alt.Tooltip("연도:N", title="학년도"),
-                    alt.Tooltip("최저:Q", format=".2f", title="최저점"),
-                ],
-            )
-
-            max_point = base.mark_point(
-                filled=True, color="#3157C8", size=90, stroke="#FFFFFF", strokeWidth=1.5
-            ).encode(
-                x=alt.X("최고:Q", scale=x_scale, axis=None),
-                tooltip=[
-                    alt.Tooltip("연도:N", title="학년도"),
-                    alt.Tooltip("최고:Q", format=".2f", title="최고점"),
-                ],
-            )
-
-            avg_point = base.mark_point(
-                filled=True, color="#14264D", shape="diamond", size=145,
-                stroke="#FFFFFF", strokeWidth=1,
-            ).encode(
-                x=alt.X("평균:Q", scale=x_scale, axis=None),
-                tooltip=[
-                    alt.Tooltip("연도:N", title="학년도"),
-                    alt.Tooltip("평균:Q", format=".2f", title="평균점"),
-                ],
-            )
-
-            max_txt = base.mark_text(
-                align="left", dx=8, dy=-10, fontSize=11, color="#2447A8", fontWeight=700
-            ).encode(
-                x=alt.X("최고:Q", scale=x_scale, axis=None),
-                text=alt.Text("최고:Q", format=".2f"),
-            )
-
-            min_txt = base.mark_text(
-                align="right", dx=-8, dy=10, fontSize=11, color="#087F75", fontWeight=700
-            ).encode(
-                x=alt.X("최저:Q", scale=x_scale, axis=None),
-                text=alt.Text("최저:Q", format=".2f"),
-            )
-
-            my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
-            my_line = alt.Chart(my_score_df).mark_rule(
-                color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
-            ).encode(
-                x=alt.X("내 점수:Q", scale=x_scale, axis=None),
-                tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")],
-            )
-
-            chart = (
-                alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
-                .properties(
-                    height=280,
-                    padding={"left": 8, "right": 24, "top": 10, "bottom": 2},
                 )
-                .configure_view(stroke=None, fill="#FFFFFF")
-                .configure_axis(
-                    labelFont="Malgun Gothic, sans-serif",
-                    titleFont="Malgun Gothic, sans-serif",
+
+                base = alt.Chart(chart_data).encode(y=y_encoding)
+
+                x_scale = alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False)
+
+                range_rule = base.mark_rule(
+                    color="#CBD5E5", strokeWidth=5, strokeCap="round"
+                ).encode(
+                    x=alt.X(
+                        "최저:Q",
+                        title="환산점수 · 100점 기준",
+                        scale=x_scale,
+                        axis=alt.Axis(
+                            titleFontSize=12,
+                            titleFontWeight=600,
+                            titleColor="#64708A",
+                            titlePadding=14,
+                            labelFontSize=11,
+                            labelColor="#64708A",
+                            tickCount=6,
+                            grid=True,
+                            gridColor="#E9EDF5",
+                            gridDash=[2, 3],
+                            domain=False,
+                            tickSize=0,
+                            format=".1f",
+                        ),
+                    ),
+                    x2="최고:Q",
+                    tooltip=[
+                        alt.Tooltip("연도:N", title="학년도"),
+                        alt.Tooltip("최고:Q", format=".2f", title="최고점"),
+                        alt.Tooltip("평균:Q", format=".2f", title="평균점"),
+                        alt.Tooltip("최저:Q", format=".2f", title="최저점"),
+                    ],
                 )
-            )
 
-            st.altair_chart(chart, use_container_width=True)
+                min_point = base.mark_point(
+                    filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
+                ).encode(
+                    x=alt.X("최저:Q", scale=x_scale, axis=None),
+                    tooltip=[
+                        alt.Tooltip("연도:N", title="학년도"),
+                        alt.Tooltip("최저:Q", format=".2f", title="최저점"),
+                    ],
+                )
 
-        st.markdown(
-            "<div style='width:100%;text-align:center;margin-top:0px;font-size:12.5px;line-height:1.4;'>"
-            "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
-            "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
-            "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
-            "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
-            "</div>",
-            unsafe_allow_html=True,
-        )
+                max_point = base.mark_point(
+                    filled=True, color="#3157C8", size=90, stroke="#FFFFFF", strokeWidth=1.5
+                ).encode(
+                    x=alt.X("최고:Q", scale=x_scale, axis=None),
+                    tooltip=[
+                        alt.Tooltip("연도:N", title="학년도"),
+                        alt.Tooltip("최고:Q", format=".2f", title="최고점"),
+                    ],
+                )
 
-        # [변경] 05번 카드 닫기
-        st.markdown(
-            '</div>',
-            unsafe_allow_html=True,
-        )
+                avg_point = base.mark_point(
+                    filled=True, color="#14264D", shape="diamond", size=145,
+                    stroke="#FFFFFF", strokeWidth=1,
+                ).encode(
+                    x=alt.X("평균:Q", scale=x_scale, axis=None),
+                    tooltip=[
+                        alt.Tooltip("연도:N", title="학년도"),
+                        alt.Tooltip("평균:Q", format=".2f", title="평균점"),
+                    ],
+                )
+
+                max_txt = base.mark_text(
+                    align="left", dx=8, dy=-10, fontSize=11, color="#2447A8", fontWeight=700
+                ).encode(
+                    x=alt.X("최고:Q", scale=x_scale, axis=None),
+                    text=alt.Text("최고:Q", format=".2f"),
+                )
+
+                min_txt = base.mark_text(
+                    align="right", dx=-8, dy=10, fontSize=11, color="#087F75", fontWeight=700
+                ).encode(
+                    x=alt.X("최저:Q", scale=x_scale, axis=None),
+                    text=alt.Text("최저:Q", format=".2f"),
+                )
+
+                my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
+                my_line = alt.Chart(my_score_df).mark_rule(
+                    color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
+                ).encode(
+                    x=alt.X("내 점수:Q", scale=x_scale, axis=None),
+                    tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")],
+                )
+
+                chart = (
+                    alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
+                    .properties(
+                        height=280,
+                        padding={"left": 8, "right": 24, "top": 10, "bottom": 2},
+                    )
+                    .configure_view(stroke=None, fill="#FFFFFF")
+                    .configure_axis(
+                        labelFont="Malgun Gothic, sans-serif",
+                        titleFont="Malgun Gothic, sans-serif",
+                    )
+                )
+
+                st.altair_chart(chart, use_container_width=True)
+
+                st.markdown(
+                    "<div style='width:100%;text-align:center;margin-top:0px;font-size:12.5px;line-height:1.4;'>"
+                    "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
+                    "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
+                    "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
+                    "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
 
     with table_col:
         sorted_hist = history.sort_values("연도", ascending=False)
@@ -1518,8 +1510,3 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
