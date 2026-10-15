@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03번 스크롤바 원천 제거 및 정밀 여백 보정)
+# 2. 디자인 (03번 원본 사이즈 100% 복원 + 컨테이너 525px 확장)
 # ==================================================
 st.markdown(
     """
@@ -92,7 +92,6 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
-    /* 컨테이너 외곽 및 모든 하위 요소 스크롤바 완벽 차단 */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: #FFFFFF;
         border: 1px solid var(--line) !important;
@@ -175,7 +174,7 @@ st.markdown(
     }
     .section-title {
         display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 0px 0 8px;
+        font-size: 20px; font-weight: 850; margin: 2px 0 10px;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
@@ -197,61 +196,61 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
-    /* [정밀 보정] 03번 상단 학과 산출성적(score-hero) 세로 여백 최적화 */
+    /* [원복 완료] 03번 상단 학과 산출성적(score-hero) 아까의 시원한 원본 크기 그대로 복원 */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 15px; padding: 12px 20px; color: #FFFFFF; margin-bottom: 8px;
+        border-radius: 16px; padding: 16px 22px; color: #FFFFFF; margin-bottom: 12px;
         box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
     }
     .score-hero::after {
-        content: ""; position: absolute; right: -50px; top: -50px; width: 170px; height: 170px;
+        content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
         border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
     }
-    .score-label { font-size: 13.5px; font-weight: 700; color: #C3CEEA; }
+    .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(30px, 3vw, 42px); font-weight: 900; letter-spacing: -1.5px;
-        line-height: 1.08; margin: 2px 0 6px; font-variant-numeric: tabular-nums;
+        font-size: clamp(34px, 3.4vw, 48px); font-weight: 900; letter-spacing: -1.5px;
+        line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .score-number small { font-size: 16px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
+    .score-number small { font-size: 18px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 6px;
-        color: #C3CEEA; font-size: 12.5px; line-height: 1.3;
+        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;
+        color: #C3CEEA; font-size: 13px; line-height: 1.4;
     }
 
-    /* [정밀 보정] 03번 중단 60%, 40% 인라인 요약 박스 */
+    /* [원복 완료] 03번 중단 60%, 40% 인라인 요약 박스 원본 크기 복원 */
     .sub-metric-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
     }
     .sub-metric-box {
-        background: #F8FAFE; border: 1px solid var(--line); border-radius: 11px; padding: 7px 14px;
+        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px;
     }
     .sub-metric-lbl {
-        font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px;
+        font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
     }
     .sub-metric-val-row {
         display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
     }
     .sub-metric-val {
-        font-size: 21px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.15;
+        font-size: 24px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.2;
     }
     .sub-metric-calc {
-        font-size: 12.5px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
+        font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
-    /* [정밀 보정] 03번 하단: 전 영역 환산 및 반영 판정 보드 (스크롤바 유발 여백 제거) */
+    /* [원복 완료] 03번 하단: 전 영역 환산 및 반영 판정 보드 원본 크기 복원 */
     .audit-header {
-        font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 0px 0 5px 2px;
+        font-size: 13px; font-weight: 800; color: var(--muted); margin: 2px 0 7px 2px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .audit-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-bottom: 0px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 2px;
     }
     .audit-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 5.5px 11px; border-radius: 9px; border: 1px solid var(--line); background: #FFFFFF;
-        font-size: 13px;
+        padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
+        font-size: 13.5px;
     }
     .audit-item.active-60 {
         background: rgba(29, 63, 160, 0.06); border-color: rgba(29, 63, 160, 0.35);
@@ -262,16 +261,17 @@ st.markdown(
     .audit-item.dropped {
         background: #F8FAFE; opacity: 0.72;
     }
-    .audit-left { display: flex; flex-direction: column; gap: 0px; min-width: 0; }
-    .audit-subj { font-weight: 800; color: var(--navy); font-size: 12.5px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .audit-raw { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
-    .audit-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .audit-conv { font-size: 13.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
-    .tag-60 { background: #1D3FA0; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
-    .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
-    .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 5px; }
+    .audit-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .audit-subj { font-weight: 800; color: var(--navy); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-raw { font-size: 11.5px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .audit-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .audit-conv { font-size: 14.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .tag-60 { background: #1D3FA0; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
+    .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
+    .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2.5px 7px; border-radius: 5px; }
 
-    .status { border-radius: 12px; padding: 13px 18px; margin: 6px 0 12px; font-size: 16px; font-weight: 850; line-height: 1.5; }
+    /* 04번 요소들도 525px 컨테이너에 맞춰 여유 있게 밸런스 조정 */
+    .status { border-radius: 12px; padding: 15px 18px; margin: 8px 0 14px; font-size: 16px; font-weight: 850; line-height: 1.55; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
@@ -281,11 +281,10 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* 04, 06, 07번 스타일 유지 */
-    .cmp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .cmp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 18px; background: #F8FAFE; border: 1px solid var(--line);
+        padding: 16px 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
@@ -376,7 +375,7 @@ st.markdown(
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
-        .score-hero { padding: 14px; }
+        .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
     }
 </style>
@@ -553,7 +552,7 @@ def detect_scale(df):
 data_scale = detect_scale(db) if not db.empty else 100
 
 # ==================================================
-# 5. 계산 함수 (6개 전 영역 환산 및 반영 여부 판정 데이터 유지)
+# 5. 계산 함수
 # ==================================================
 def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
                     inq1_subj, inq1, inq2_subj, inq2):
@@ -854,7 +853,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역: height=505으로 여유 확보 + 스크롤 완전 제거)
+# 7. 결과 출력 (03번 원본 크기 100% 복원 + 컨테이너 525px 확장으로 스크롤 제거)
 # ==================================================
 result = st.session_state.result
 
@@ -876,7 +875,8 @@ history = build_history(record) if record is not None and data_scale else pd.Dat
 result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
-    with st.container(border=True, height=505):
+    # [핵심 수정] 내부를 줄이는 대신 컨테이너 높이를 525로 늘려 아까의 시원한 크기를 그대로 수용
+    with st.container(border=True, height=525):
         section_title("03", "환산 점수")
 
         first_name, first_score = result["first"]
@@ -943,7 +943,7 @@ with result_col:
         )
 
 with comparison_col:
-    with st.container(border=True, height=505):
+    with st.container(border=True, height=525):
         section_title("04", "전년도 입시 결과 비교")
 
         if record is not None and not data_scale and not db.empty:
@@ -1433,3 +1433,8 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
