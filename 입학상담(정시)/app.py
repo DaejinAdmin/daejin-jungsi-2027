@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03번 하단 '전 영역 환산 및 반영 판정 보드' 스타일 포함)
+# 2. 디자인 (03번 스크롤바 원천 제거 및 정밀 여백 보정)
 # ==================================================
 st.markdown(
     """
@@ -92,18 +92,23 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
+    /* 컨테이너 외곽 및 모든 하위 요소 스크롤바 완벽 차단 */
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: #FFFFFF;
         border: 1px solid var(--line) !important;
         border-radius: 16px !important;
         box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
     }
-    [data-testid="stVerticalBlockBorderWrapper"] > div {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stVerticalBlockBorderWrapper"] * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
     }
-    [data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar {
-        display: none;
+    [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar,
+    [data-testid="stVerticalBlockBorderWrapper"] *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 
     [data-testid="stImage"] img {
@@ -170,7 +175,7 @@ st.markdown(
     }
     .section-title {
         display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 2px 0 10px;
+        font-size: 20px; font-weight: 850; margin: 0px 0 8px;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
@@ -192,60 +197,60 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
-    /* 03번 상단 학과 산출성적(score-hero) */
+    /* [정밀 보정] 03번 상단 학과 산출성적(score-hero) 세로 여백 최적화 */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 16px; padding: 15px 22px; color: #FFFFFF; margin-bottom: 10px;
+        border-radius: 15px; padding: 12px 20px; color: #FFFFFF; margin-bottom: 8px;
         box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
     }
     .score-hero::after {
-        content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
+        content: ""; position: absolute; right: -50px; top: -50px; width: 170px; height: 170px;
         border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
     }
     .score-label { font-size: 13.5px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(32px, 3.2vw, 44px); font-weight: 900; letter-spacing: -1.5px;
-        line-height: 1.1; margin: 3px 0 7px; font-variant-numeric: tabular-nums;
+        font-size: clamp(30px, 3vw, 42px); font-weight: 900; letter-spacing: -1.5px;
+        line-height: 1.08; margin: 2px 0 6px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .score-number small { font-size: 17px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
+    .score-number small { font-size: 16px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 7px;
-        color: #C3CEEA; font-size: 12.5px; line-height: 1.35;
+        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 6px;
+        color: #C3CEEA; font-size: 12.5px; line-height: 1.3;
     }
 
-    /* 03번 중단 60%, 40% 인라인 요약 박스 */
+    /* [정밀 보정] 03번 중단 60%, 40% 인라인 요약 박스 */
     .sub-metric-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;
     }
     .sub-metric-box {
-        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 9px 14px;
+        background: #F8FAFE; border: 1px solid var(--line); border-radius: 11px; padding: 7px 14px;
     }
     .sub-metric-lbl {
-        font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 2px;
+        font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px;
     }
     .sub-metric-val-row {
         display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
     }
     .sub-metric-val {
-        font-size: 22px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.15;
+        font-size: 21px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.15;
     }
     .sub-metric-calc {
         font-size: 12.5px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
-    /* [신설] 03번 하단: 중복 제거 후 들어가는 '전 영역 환산 및 반영 판정 보드' (2x3 그리드) */
+    /* [정밀 보정] 03번 하단: 전 영역 환산 및 반영 판정 보드 (스크롤바 유발 여백 제거) */
     .audit-header {
-        font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 2px 0 6px 2px;
+        font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 0px 0 5px 2px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .audit-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding-bottom: 8px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-bottom: 0px;
     }
     .audit-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 7px 11px; border-radius: 9px; border: 1px solid var(--line); background: #FFFFFF;
+        padding: 5.5px 11px; border-radius: 9px; border: 1px solid var(--line); background: #FFFFFF;
         font-size: 13px;
     }
     .audit-item.active-60 {
@@ -257,11 +262,11 @@ st.markdown(
     .audit-item.dropped {
         background: #F8FAFE; opacity: 0.72;
     }
-    .audit-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-    .audit-subj { font-weight: 800; color: var(--navy); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .audit-raw { font-size: 11.5px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .audit-left { display: flex; flex-direction: column; gap: 0px; min-width: 0; }
+    .audit-subj { font-weight: 800; color: var(--navy); font-size: 12.5px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-raw { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
     .audit-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .audit-conv { font-size: 14px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .audit-conv { font-size: 13.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
     .tag-60 { background: #1D3FA0; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
     .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
     .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 5px; }
@@ -280,7 +285,7 @@ st.markdown(
     .cmp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 13px 18px; background: #F8FAFE; border: 1px solid var(--line);
+        padding: 14px 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
@@ -371,7 +376,7 @@ st.markdown(
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
-        .score-hero { padding: 16px; }
+        .score-hero { padding: 14px; }
         .section-title { font-size: 18px; }
     }
 </style>
@@ -548,7 +553,7 @@ def detect_scale(df):
 data_scale = detect_scale(db) if not db.empty else 100
 
 # ==================================================
-# 5. 계산 함수 (6개 전 영역 환산 및 반영 여부 판정 데이터 추가)
+# 5. 계산 함수 (6개 전 영역 환산 및 반영 여부 판정 데이터 유지)
 # ==================================================
 def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
                     inq1_subj, inq1, inq2_subj, inq2):
@@ -584,7 +589,6 @@ def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
 
     raw_score = first[1] * 0.6 + second[1] * 0.4
 
-    # 6개 전체 과목의 환산 과정 및 채택/미반영 상태 기록
     all_subjects = [
         {
             "key": "국어",
@@ -850,7 +854,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03번 하단 중복 제거 -> 6개 전 영역 판정 보드 탑재)
+# 7. 결과 출력 (03, 04번 영역: height=505으로 여유 확보 + 스크롤 완전 제거)
 # ==================================================
 result = st.session_state.result
 
@@ -872,13 +876,12 @@ history = build_history(record) if record is not None and data_scale else pd.Dat
 result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
-    with st.container(border=True, height=495):
+    with st.container(border=True, height=505):
         section_title("03", "환산 점수")
 
         first_name, first_score = result["first"]
         second_name, second_score = result["second"]
 
-        # [핵심 개편] 중복되던 2줄 산출근거 대신 '전 영역(6과목) 환산 및 반영 판정 보드' 배치
         audit_cards_html = ""
         for s_item in result["all_subjects"]:
             role = s_item["role"]
@@ -940,7 +943,7 @@ with result_col:
         )
 
 with comparison_col:
-    with st.container(border=True, height=495):
+    with st.container(border=True, height=505):
         section_title("04", "전년도 입시 결과 비교")
 
         if record is not None and not data_scale and not db.empty:
