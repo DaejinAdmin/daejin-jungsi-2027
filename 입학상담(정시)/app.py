@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03번 히어로 박스 슬림화 및 인라인 메트릭 추가)
+# 2. 디자인 (03번 하단 '전 영역 환산 및 반영 판정 보드' 스타일 포함)
 # ==================================================
 st.markdown(
     """
@@ -192,48 +192,79 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
-    /* [수정] 03번 학과 산출성적(score-hero) 박스 높이 및 폰트 슬림화 */
+    /* 03번 상단 학과 산출성적(score-hero) */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 16px; padding: 16px 22px; color: #FFFFFF; margin-bottom: 12px;
+        border-radius: 16px; padding: 15px 22px; color: #FFFFFF; margin-bottom: 10px;
         box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
     }
     .score-hero::after {
         content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
         border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
     }
-    .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
+    .score-label { font-size: 13.5px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(34px, 3.4vw, 48px); font-weight: 900; letter-spacing: -1.5px;
-        line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
+        font-size: clamp(32px, 3.2vw, 44px); font-weight: 900; letter-spacing: -1.5px;
+        line-height: 1.1; margin: 3px 0 7px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .score-number small { font-size: 18px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
+    .score-number small { font-size: 17px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;
-        color: #C3CEEA; font-size: 13px; line-height: 1.4;
+        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 7px;
+        color: #C3CEEA; font-size: 12.5px; line-height: 1.35;
     }
 
-    /* [수정] 60%, 40% 반영 점수 옆에 산출 내역(83.00 x 60%)을 나란히 배치하는 스타일 */
+    /* 03번 중단 60%, 40% 인라인 요약 박스 */
     .sub-metric-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;
     }
     .sub-metric-box {
-        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px;
+        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 9px 14px;
     }
     .sub-metric-lbl {
-        font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
+        font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 2px;
     }
     .sub-metric-val-row {
         display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
     }
     .sub-metric-val {
-        font-size: 24px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.2;
+        font-size: 22px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.15;
     }
     .sub-metric-calc {
-        font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
+        font-size: 12.5px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
+
+    /* [신설] 03번 하단: 중복 제거 후 들어가는 '전 영역 환산 및 반영 판정 보드' (2x3 그리드) */
+    .audit-header {
+        font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 2px 0 6px 2px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .audit-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding-bottom: 8px;
+    }
+    .audit-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 7px 11px; border-radius: 9px; border: 1px solid var(--line); background: #FFFFFF;
+        font-size: 13px;
+    }
+    .audit-item.active-60 {
+        background: rgba(29, 63, 160, 0.06); border-color: rgba(29, 63, 160, 0.35);
+    }
+    .audit-item.active-40 {
+        background: rgba(5, 150, 105, 0.06); border-color: rgba(5, 150, 105, 0.35);
+    }
+    .audit-item.dropped {
+        background: #F8FAFE; opacity: 0.72;
+    }
+    .audit-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .audit-subj { font-weight: 800; color: var(--navy); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-raw { font-size: 11.5px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .audit-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .audit-conv { font-size: 14px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .tag-60 { background: #1D3FA0; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
+    .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
+    .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 5px; }
 
     .status { border-radius: 12px; padding: 13px 18px; margin: 6px 0 12px; font-size: 16px; font-weight: 850; line-height: 1.5; }
     .empty-state {
@@ -245,9 +276,7 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* ==================================================
-       [폰트 확대 & 여백 압축] 04, 06, 07번 내부 텍스트 가독성 강화
-       ================================================== */
+    /* 04, 06, 07번 스타일 유지 */
     .cmp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
@@ -519,34 +548,87 @@ def detect_scale(df):
 data_scale = detect_scale(db) if not db.empty else 100
 
 # ==================================================
-# 5. 계산 함수
+# 5. 계산 함수 (6개 전 영역 환산 및 반영 여부 판정 데이터 추가)
 # ==================================================
 def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
                     inq1_subj, inq1, inq2_subj, inq2):
     engineering = dept in ENG_DEPTS
-    math_adj = math_val * (1.1 if engineering and math_subj in ("미적분", "기하") else 1)
+    math_bonus = engineering and math_subj in ("미적분", "기하")
+    math_adj = math_val * (1.1 if math_bonus else 1)
 
-    def inquiry(subj, value):
+    def inquiry_info(subj, value):
         if subj == "선택안함":
-            return 0.0
+            return 0.0, False
         sci = any(name in subj for name in ("물리학", "화학", "생명과학", "지구과학"))
-        return value * (1.07 if engineering and sci else 1)
+        bonus = engineering and sci
+        return value * (1.07 if bonus else 1), bonus
 
-    inquiry_scores = [inquiry(inq1_subj, inq1), inquiry(inq2_subj, inq2)]
+    inq1_adj, inq1_bonus = inquiry_info(inq1_subj, inq1)
+    inq2_adj, inq2_bonus = inquiry_info(inq2_subj, inq2)
+    inquiry_scores = [inq1_adj, inq2_adj]
     best_inquiry = max(range(2), key=lambda index: inquiry_scores[index])
 
-    primary = [("국어", kor), ("수학", math_adj), ("영어", GRADE_MAP.get(eng_g, 0))]
+    eng_score = GRADE_MAP.get(eng_g, 0)
+    hist_score = GRADE_MAP.get(hist_g, 0)
+
+    primary = [("국어", kor), ("수학", math_adj), ("영어", eng_score)]
     first_index = max(range(3), key=lambda index: primary[index][1])
     first = primary[first_index]
 
     remaining = [item for index, item in enumerate(primary) if index != first_index]
     remaining += [
         (f"탐구 {best_inquiry + 1}", inquiry_scores[best_inquiry]),
-        ("한국사", GRADE_MAP.get(hist_g, 0)),
+        ("한국사", hist_score),
     ]
     second = max(remaining, key=lambda item: item[1])
 
     raw_score = first[1] * 0.6 + second[1] * 0.4
+
+    # 6개 전체 과목의 환산 과정 및 채택/미반영 상태 기록
+    all_subjects = [
+        {
+            "key": "국어",
+            "title": "국어",
+            "raw": f"백분위 {kor:.0f}",
+            "conv": kor,
+            "role": "60% 반영" if first[0] == "국어" else ("40% 반영" if second[0] == "국어" else "미반영"),
+        },
+        {
+            "key": "수학",
+            "title": f"수학 ({math_subj})",
+            "raw": f"백분위 {math_val:.0f}" + (" (+10%)" if math_bonus else ""),
+            "conv": math_adj,
+            "role": "60% 반영" if first[0] == "수학" else ("40% 반영" if second[0] == "수학" else "미반영"),
+        },
+        {
+            "key": "영어",
+            "title": "영어",
+            "raw": f"{eng_g}등급 환산",
+            "conv": float(eng_score),
+            "role": "60% 반영" if first[0] == "영어" else ("40% 반영" if second[0] == "영어" else "미반영"),
+        },
+        {
+            "key": "한국사",
+            "title": "한국사",
+            "raw": f"{hist_g}등급 환산",
+            "conv": float(hist_score),
+            "role": "40% 반영" if second[0] == "한국사" else "미반영",
+        },
+        {
+            "key": "탐구 1",
+            "title": f"탐구1 ({inq1_subj})" if inq1_subj != "선택안함" else "탐구1 (미선택)",
+            "raw": (f"백분위 {inq1:.0f}" + (" (+7%)" if inq1_bonus else "")) if inq1_subj != "선택안함" else "미응시",
+            "conv": inq1_adj,
+            "role": "40% 반영" if second[0] == "탐구 1" else ("탐구상위" if best_inquiry == 0 and inq1_subj != "선택안함" else "미반영"),
+        },
+        {
+            "key": "탐구 2",
+            "title": f"탐구2 ({inq2_subj})" if inq2_subj != "선택안함" else "탐구2 (미선택)",
+            "raw": (f"백분위 {inq2:.0f}" + (" (+7%)" if inq2_bonus else "")) if inq2_subj != "선택안함" else "미응시",
+            "conv": inq2_adj,
+            "role": "40% 반영" if second[0] == "탐구 2" else ("탐구상위" if best_inquiry == 1 and inq2_subj != "선택안함" else "미반영"),
+        },
+    ]
 
     return {
         "score": round(raw_score, 2),
@@ -554,6 +636,7 @@ def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
         "first": first,
         "second": second,
         "engineering": engineering,
+        "all_subjects": all_subjects,
     }
 
 
@@ -767,7 +850,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03번 드롭다운 펼침 시 한 화면 완벽 수용)
+# 7. 결과 출력 (03번 하단 중복 제거 -> 6개 전 영역 판정 보드 탑재)
 # ==================================================
 result = st.session_state.result
 
@@ -795,7 +878,31 @@ with result_col:
         first_name, first_score = result["first"]
         second_name, second_score = result["second"]
 
-        # [핵심 수정] 학과 산출성적 박스 슬림화(하단 문구 1줄 통합) + 60%/40% 점수 옆에 계산식 인라인 배치
+        # [핵심 개편] 중복되던 2줄 산출근거 대신 '전 영역(6과목) 환산 및 반영 판정 보드' 배치
+        audit_cards_html = ""
+        for s_item in result["all_subjects"]:
+            role = s_item["role"]
+            if role == "60% 반영":
+                item_cls, badge_html = "active-60", '<span class="tag-60">60% 반영</span>'
+            elif role == "40% 반영":
+                item_cls, badge_html = "active-40", '<span class="tag-40">40% 반영</span>'
+            elif role == "탐구상위":
+                item_cls, badge_html = "dropped", '<span class="tag-drop">후보(미반영)</span>'
+            else:
+                item_cls, badge_html = "dropped", '<span class="tag-drop">미반영</span>'
+
+            audit_cards_html += (
+                f'<div class="audit-item {item_cls}">'
+                f'<div class="audit-left">'
+                f'<span class="audit-subj">{escape(s_item["title"])}</span>'
+                f'<span class="audit-raw">{escape(s_item["raw"])}</span>'
+                f'</div>'
+                f'<div class="audit-right">'
+                f'<span class="audit-conv">{s_item["conv"]:.2f}점</span>'
+                f'{badge_html}'
+                f'</div></div>'
+            )
+
         st.markdown(
             f"""
             <div class="score-hero">
@@ -821,32 +928,16 @@ with result_col:
                     </div>
                 </div>
             </div>
+            <div class="audit-header">
+                <span>전 영역 환산 및 반영 판정 내역</span>
+                <span style="font-weight:600; font-size:11.5px;">가산점·등급 환산 적용 후 상위 2개 영역 자동 채택</span>
+            </div>
+            <div class="audit-grid">
+                {audit_cards_html}
+            </div>
             """,
             unsafe_allow_html=True,
         )
-
-        with st.expander("산출 근거 자세히 보기"):
-            st.markdown(
-                f"""
-                <div class="cmp-list" style="margin-top:0px; gap:6px;">
-                    <div class="cmp-row" style="padding:7px 14px;">
-                        <span class="cmp-lbl" style="font-size:14px;">60% 반영 ({escape(first_name)})</span>
-                        <div class="cmp-val-group">
-                            <span style="font-size:13px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
-                            <span class="cmp-score" style="font-size:16px;">{first_score * 0.6:.2f}점</span>
-                        </div>
-                    </div>
-                    <div class="cmp-row" style="padding:7px 14px;">
-                        <span class="cmp-lbl" style="font-size:14px;">40% 반영 ({escape(second_name)})</span>
-                        <div class="cmp-val-group">
-                            <span style="font-size:13px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
-                            <span class="cmp-score" style="font-size:16px;">{second_score * 0.4:.2f}점</span>
-                        </div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
 
 with comparison_col:
     with st.container(border=True, height=495):
@@ -1126,7 +1217,7 @@ if not history.empty:
             st.markdown(cards_html, unsafe_allow_html=True)
 
 # ==================================================
-# 9. 모집단위 추천 및 모집단위 비교 (타이포그래피 확대 적용)
+# 9. 모집단위 추천 및 모집단위 비교 (타이포그래피 확대 유지)
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
@@ -1339,8 +1430,3 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
