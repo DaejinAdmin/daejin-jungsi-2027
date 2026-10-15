@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (st.container(height) 폐기 -> 무스크롤 마스터 카드 적용)
+# 2. 디자인 (03/04 고정 높이 일치 + 04 공백 제거 + 05/06 흰색 배경 통일)
 # ==================================================
 st.markdown(
     """
@@ -92,47 +92,77 @@ st.markdown(
     }
     h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
 
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background: #FFFFFF;
+    /* 모든 st.container(border=True)에 흰색 배경과 그림자 강제 부여 (01, 02, 05번 배경 실종 방지) */
+    [data-testid="stVerticalBlockBorderWrapper"],
+    div[data-testid="stVerticalBlock"] > div[style*="border"] {
+        background-color: #FFFFFF !important;
         border: 1px solid var(--line) !important;
         border-radius: 16px !important;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055) !important;
     }
 
-    /* [핵심 해결책] 03, 04번을 감싸는 무스크롤 순수 HTML 마스터 카드 (양쪽 555px 완벽 일치) */
+    /* 05번 차트 컨테이너를 우측 06번 마스터 카드(440px)와 동일한 높이 및 흰색 배경으로 강제 고정 */
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(.sec-05-marker) {
+        background-color: #FFFFFF !important;
+        height: 440px !important;
+        min-height: 440px !important;
+        max-height: 440px !important;
+        padding: 20px 22px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    /* [핵심] 03, 04번 고정 높이 565px (min-height가 아닌 height로 양쪽 1px 오차 없이 통일) */
     .master-card {
-        background: #FFFFFF;
+        background-color: #FFFFFF;
         border: 1px solid var(--line);
         border-radius: 16px;
         padding: 20px 22px;
         box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
-        min-height: 555px;
+        height: 565px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         margin-bottom: 16px;
     }
 
-    /* 04번 상단 3열 최고/평균/최저 메트릭 (st.metric 대체용 HTML) */
+    /* 06번 전용 마스터 카드 (좌측 05번 차트 박스와 정확히 440px로 통일) */
+    .master-card-06 {
+        background-color: #FFFFFF;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 22px;
+        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        height: 440px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+    }
+
+    /* 04번 상단 3열 최고/평균/최저 메트릭 */
     .top3-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
-        margin: 4px 0 10px;
+        margin: 4px 0 14px;
+        background: #F8FAFE;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 16px;
     }
     .top3-lbl {
         color: var(--muted);
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 700;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
     }
     .top3-val {
         color: var(--navy);
-        font-size: clamp(22px, 2.1vw, 29px);
+        font-size: clamp(22px, 2vw, 27px);
         font-weight: 850;
         font-variant-numeric: tabular-nums;
-        line-height: 1.2;
+        line-height: 1.15;
     }
 
     [data-testid="stImage"] img {
@@ -190,7 +220,7 @@ st.markdown(
     }
     .section-title {
         display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 0px 0 12px;
+        font-size: 20px; font-weight: 850; margin: 0px 0 12px; flex-shrink: 0;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
@@ -212,12 +242,12 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
-    /* 03번 상단 학과 산출성적(score-hero) 시원한 원본 크기 그대로 유지 */
+    /* 03번 상단 학과 산출성적(score-hero) */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
         border-radius: 16px; padding: 18px 24px; color: #FFFFFF; margin-bottom: 12px;
-        box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
+        box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18); flex-shrink: 0;
     }
     .score-hero::after {
         content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
@@ -225,7 +255,7 @@ st.markdown(
     }
     .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(36px, 3.5vw, 50px); font-weight: 900; letter-spacing: -1.5px;
+        font-size: clamp(36px, 3.5vw, 48px); font-weight: 900; letter-spacing: -1.5px;
         line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
@@ -237,7 +267,7 @@ st.markdown(
 
     /* 03번 중단 60%, 40% 인라인 요약 박스 */
     .sub-metric-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; flex-shrink: 0;
     }
     .sub-metric-box {
         background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px;
@@ -255,17 +285,20 @@ st.markdown(
         font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
-    /* 03번 하단: 전 영역 환산 및 반영 판정 보드 */
+    /* 03번 하단: 전 영역 환산 및 반영 판정 보드 (남은 세로 공간을 균등하게 채움) */
+    .audit-wrap {
+        flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+    }
     .audit-header {
-        font-size: 13px; font-weight: 800; color: var(--muted); margin: 2px 0 7px 2px;
+        font-size: 13px; font-weight: 800; color: var(--muted); margin: 0px 0 8px 2px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .audit-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 8px;
     }
     .audit-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 9px 13px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
+        padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
         font-size: 13.5px;
     }
     .audit-item.active-60 {
@@ -286,21 +319,17 @@ st.markdown(
     .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
     .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2.5px 7px; border-radius: 5px; }
 
-    .status { border-radius: 12px; padding: 15px 18px; margin: 12px 0 14px; font-size: 16px; font-weight: 850; line-height: 1.55; }
-    .empty-state {
-        text-align: center; padding: 50px 20px; background: #FFFFFF;
-        border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
+    /* [핵심 수정] 04번 판정 박스 밑의 거대한 공백 제거 -> 자연스러운 14px 간격 유지 후 비교 바 3개가 남은 공간 균등 분배 */
+    .status {
+        border-radius: 12px; padding: 15px 18px; margin: 0 0 14px 0;
+        font-size: 16px; font-weight: 850; line-height: 1.55; flex-shrink: 0;
     }
-    .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-
-    div[data-testid="stHorizontalBlock"] { align-items: stretch; }
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
-
-    /* 04번 비교 스트립 */
-    .cmp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .cmp-list {
+        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 0;
+    }
     .cmp-row {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 16px 18px; background: #F8FAFE; border: 1px solid var(--line);
+        flex: 1; display: flex; align-items: center; justify-content: space-between;
+        padding: 0 18px; background: #F8FAFE; border: 1px solid var(--line);
         border-radius: 12px; transition: all 0.15s ease;
     }
     .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
@@ -315,11 +344,23 @@ st.markdown(
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번 3개년 요약 카드 (05번 차트 높이와 정확히 대칭되도록 설정) */
-    .yr-card-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+    .empty-state {
+        text-align: center; padding: 50px 20px; background: #FFFFFF;
+        border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
+    }
+    .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+
+    div[data-testid="stHorizontalBlock"] { align-items: stretch; }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
+
+    /* 06번 3개년 요약 카드 (440px 마스터 카드 내부를 균등하게 채움) */
+    .yr-card-list {
+        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 2px;
+    }
     .yr-card {
+        flex: 1; display: flex; flex-direction: column; justify-content: center;
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 9px 14px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 8px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
     .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
@@ -395,7 +436,7 @@ st.markdown(
         .rule-item { min-width: 100%; }
         .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
-        .master-card { min-height: auto; }
+        .master-card, .master-card-06 { height: auto; }
     }
 </style>
 """,
@@ -872,7 +913,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역: st.container(height) 완전 폐기 -> 무스크롤 마스터 카드)
+# 7. 결과 출력 (03, 04번: 고정 565px 일치 + 04번 중간 공백 제거)
 # ==================================================
 result = st.session_state.result
 
@@ -921,37 +962,34 @@ with result_col:
             f'</div></div>'
         )
 
-    # [핵심] st.container(height)를 쓰지 않고 단일 HTML 마스터 카드로 렌더링하여 스크롤바 원천 차단
     st.markdown(
         f"""
         <div class="master-card">
-            <div>
-                <div class="section-title"><span class="step">03</span>환산 점수</div>
-                <div class="score-hero">
-                    <div class="score-label">{escape(selected_dept)}</div>
-                    <div class="score-number">{result["score"]:.2f} <small>점</small></div>
-                    <div class="score-footer">
-                        100점 기준 환산값 &nbsp;·&nbsp; 1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
+            <div class="section-title"><span class="step">03</span>환산 점수</div>
+            <div class="score-hero">
+                <div class="score-label">{escape(selected_dept)}</div>
+                <div class="score-number">{result["score"]:.2f} <small>점</small></div>
+                <div class="score-footer">
+                    100점 기준 환산값 &nbsp;·&nbsp; 1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
+                </div>
+            </div>
+            <div class="sub-metric-grid">
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">60% 반영 · {escape(first_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{first_score * 0.6:.2f}</span>
+                        <span class="sub-metric-calc">({first_score:.2f} × 60%)</span>
                     </div>
                 </div>
-                <div class="sub-metric-grid">
-                    <div class="sub-metric-box">
-                        <div class="sub-metric-lbl">60% 반영 · {escape(first_name)}</div>
-                        <div class="sub-metric-val-row">
-                            <span class="sub-metric-val">{first_score * 0.6:.2f}</span>
-                            <span class="sub-metric-calc">({first_score:.2f} × 60%)</span>
-                        </div>
-                    </div>
-                    <div class="sub-metric-box">
-                        <div class="sub-metric-lbl">40% 반영 · {escape(second_name)}</div>
-                        <div class="sub-metric-val-row">
-                            <span class="sub-metric-val">{second_score * 0.4:.2f}</span>
-                            <span class="sub-metric-calc">({second_score:.2f} × 40%)</span>
-                        </div>
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">40% 반영 · {escape(second_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{second_score * 0.4:.2f}</span>
+                        <span class="sub-metric-calc">({second_score:.2f} × 40%)</span>
                     </div>
                 </div>
             </div>
-            <div>
+            <div class="audit-wrap">
                 <div class="audit-header">
                     <span>전 영역 환산 및 반영 판정 내역</span>
                     <span style="font-weight:600; font-size:11.5px;">가산점·등급 환산 적용 후 상위 2개 영역 자동 채택</span>
@@ -1018,23 +1056,21 @@ with comparison_col:
                 )
             strip_html += '</div>'
 
-            # [핵심] 04번도 동일한 .master-card(min-height: 555px)로 렌더링하여 03번과 1px 오차 없이 높이 일치
+            # [핵심 수정] 04번 내부에서 상하 양끝 분리(space-between) 래퍼를 제거하여 중간의 거대한 공백을 없애고 비교 바 3개가 균등 확장되도록 처리
             st.markdown(
                 f"""
                 <div class="master-card">
-                    <div>
-                        <div class="section-title"><span class="step">04</span>전년도 입시 결과 비교</div>
-                        <div class="top3-grid">
-                            <div><div class="top3-lbl">2026 최고점</div><div class="top3-val">{display_number(max_score)}</div></div>
-                            <div><div class="top3-lbl">2026 평균점</div><div class="top3-val">{display_number(avg_score)}</div></div>
-                            <div><div class="top3-lbl">2026 최저점</div><div class="top3-val">{display_number(cut_score)}</div></div>
-                        </div>
-                        <div class="status" style="background:{bg}; color:{c};">
-                            {msg}<br>
-                            <span style="font-size:14.5px; font-weight:750;">
-                                전년도 평균 대비 {score - avg_score:+.2f}점
-                            </span>
-                        </div>
+                    <div class="section-title"><span class="step">04</span>전년도 입시 결과 비교</div>
+                    <div class="top3-grid">
+                        <div><div class="top3-lbl">2026 최고점</div><div class="top3-val">{display_number(max_score)}</div></div>
+                        <div><div class="top3-lbl">2026 평균점</div><div class="top3-val">{display_number(avg_score)}</div></div>
+                        <div><div class="top3-lbl">2026 최저점</div><div class="top3-val">{display_number(cut_score)}</div></div>
+                    </div>
+                    <div class="status" style="background:{bg}; color:{c};">
+                        {msg}<br>
+                        <span style="font-size:14.5px; font-weight:750;">
+                            전년도 평균 대비 {score - avg_score:+.2f}점
+                        </span>
                     </div>
                     {strip_html}
                 </div>
@@ -1055,14 +1091,17 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역: height 옵션 없이 자연 대칭)
+# 8. 결과 출력 (05, 06번: 흰색 배경 복원 및 440px 고정 대칭)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
         with st.container(border=True):
-            section_title("05", "최근 3개년 점수 분포")
+            st.markdown(
+                '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
+                unsafe_allow_html=True,
+            )
 
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
 
@@ -1194,7 +1233,7 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=305,
+                        height=310,
                         padding={"left": 8, "right": 24, "top": 12, "bottom": 4},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
@@ -1207,7 +1246,7 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:2px;padding-bottom:6px;font-size:12.5px;line-height:1.5;'>"
+                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12.5px;line-height:1.5;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
@@ -1217,37 +1256,44 @@ if not history.empty:
                 )
 
     with table_col:
-        with st.container(border=True):
-            section_title("06", "3개년 입시 결과")
+        sorted_hist = history.sort_values("연도", ascending=False)
+        cards_html = '<div class="yr-card-list">'
+        for _, h_row in sorted_hist.iterrows():
+            yr_label = f"{escape(str(h_row['연도']))}학년도"
+            mx_s = display_number(h_row["최고"])
+            av_s = display_number(h_row["평균"])
+            mn_s = display_number(h_row["최저"])
+            comp_s = escape(display_ratio(h_row["경쟁률"]))
+            add_s = escape(display_count(h_row["추가합격"]))
+            if add_s != "—" and not add_s.endswith("명"):
+                add_s += "명"
 
-            sorted_hist = history.sort_values("연도", ascending=False)
-            cards_html = '<div class="yr-card-list" style="padding-bottom:4px;">'
-            for _, h_row in sorted_hist.iterrows():
-                yr_label = f"{escape(str(h_row['연도']))}학년도"
-                mx_s = display_number(h_row["최고"])
-                av_s = display_number(h_row["평균"])
-                mn_s = display_number(h_row["최저"])
-                comp_s = escape(display_ratio(h_row["경쟁률"]))
-                add_s = escape(display_count(h_row["추가합격"]))
-                if add_s != "—" and not add_s.endswith("명"):
-                    add_s += "명"
+            cards_html += (
+                f'<div class="yr-card">'
+                f'<div class="yr-head">'
+                f'<span class="yr-title">{yr_label}</span>'
+                f'<div class="yr-tags">'
+                f'<span class="yr-tag">경쟁률 <b>{comp_s}</b></span>'
+                f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
+                f'</div></div>'
+                f'<div class="yr-metrics">'
+                f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
+                f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
+                f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
+                f'</div></div>'
+            )
+        cards_html += '</div>'
 
-                cards_html += (
-                    f'<div class="yr-card">'
-                    f'<div class="yr-head">'
-                    f'<span class="yr-title">{yr_label}</span>'
-                    f'<div class="yr-tags">'
-                    f'<span class="yr-tag">경쟁률 <b>{comp_s}</b></span>'
-                    f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
-                    f'</div></div>'
-                    f'<div class="yr-metrics">'
-                    f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
-                    f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
-                    f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
-                    f'</div></div>'
-                )
-            cards_html += '</div>'
-            st.markdown(cards_html, unsafe_allow_html=True)
+        # [핵심] 06번도 흰색 배경과 440px 고정 높이를 가진 .master-card-06으로 감싸 통일감 완벽 부여
+        st.markdown(
+            f"""
+            <div class="master-card-06">
+                <div class="section-title"><span class="step">06</span>3개년 입시 결과</div>
+                {cards_html}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 # ==================================================
 # 9. 모집단위 추천 및 모집단위 비교
@@ -1463,8 +1509,3 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
