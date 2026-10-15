@@ -139,6 +139,13 @@ st.markdown(
         overflow: hidden;
     }
 
+    /* [추가] 05번 차트 박스: 06번(master-card-056)과 동일한 440px로 고정 */
+    [data-testid="stVerticalBlockBorderWrapper"]:has(.sec-05-marker) {
+        height: 440px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
     /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
     .top3-grid {
         display: grid;
@@ -438,6 +445,8 @@ st.markdown(
         .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
         .master-card, .master-card-056 { height: auto; }
+        /* [추가] 모바일에서는 05번 박스도 06번처럼 높이 자동 */
+        [data-testid="stVerticalBlockBorderWrapper"]:has(.sec-05-marker) { height: auto; }
     }
 </style>
 """,
@@ -1098,7 +1107,7 @@ if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # [핵심 수정] 05번도 06번과 동일한 .master-card-056(높이 440px 고정)으로 감싸 양쪽 바닥선을 완벽히 일치시킴
+        # 05번 박스 높이는 위 <style>의 :has(.sec-05-marker) 규칙으로 440px 고정 (06번과 동일)
         with st.container(border=True):
             st.markdown(
                 '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
