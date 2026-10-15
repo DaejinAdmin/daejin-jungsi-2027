@@ -125,19 +125,19 @@ st.markdown(
     }
 
     /* 05, 06번 마스터 카드 (높이 440px 고정 대칭으로 05/06 높이 완벽 일치) */
-    .master-card-056 {
-        background-color: #FFFFFF;
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 20px 22px;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
-        height: 440px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 16px;
-        overflow: hidden;
-    }
+.master-card-056 {
+    background-color: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+    height: 440px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    /* overflow: hidden;  ← 이 줄을 제거하거나 주석 처리 */
+}
 
     /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
     .top3-grid {
