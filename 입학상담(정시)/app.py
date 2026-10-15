@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (틀 유지 + 04/06/07번 타이포그래피 확대)
+# 2. 디자인 (03번 히어로 박스 슬림화 및 인라인 메트릭 추가)
 # ==================================================
 st.markdown(
     """
@@ -170,7 +170,7 @@ st.markdown(
     }
     .section-title {
         display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 2px 0 12px;
+        font-size: 20px; font-weight: 850; margin: 2px 0 10px;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
@@ -192,26 +192,47 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
+    /* [수정] 03번 학과 산출성적(score-hero) 박스 높이 및 폰트 슬림화 */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 18px; padding: 26px 28px; color: #FFFFFF; margin-bottom: 16px;
-        box-shadow: 0 10px 22px rgba(8, 32, 112, 0.20);
+        border-radius: 16px; padding: 16px 22px; color: #FFFFFF; margin-bottom: 12px;
+        box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
     }
     .score-hero::after {
-        content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px;
+        content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
         border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
     }
-    .score-label { font-size: 15px; font-weight: 700; color: #C3CEEA; }
+    .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(40px, 4.2vw, 62px); font-weight: 900; letter-spacing: -2px;
-        line-height: 1.15; margin: 8px 0; font-variant-numeric: tabular-nums;
+        font-size: clamp(34px, 3.4vw, 48px); font-weight: 900; letter-spacing: -1.5px;
+        line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .score-number small { font-size: 20px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
+    .score-number small { font-size: 18px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 12px;
-        color: #C3CEEA; font-size: 13.5px; line-height: 1.6;
+        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;
+        color: #C3CEEA; font-size: 13px; line-height: 1.4;
+    }
+
+    /* [수정] 60%, 40% 반영 점수 옆에 산출 내역(83.00 x 60%)을 나란히 배치하는 스타일 */
+    .sub-metric-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;
+    }
+    .sub-metric-box {
+        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px;
+    }
+    .sub-metric-lbl {
+        font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
+    }
+    .sub-metric-val-row {
+        display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    }
+    .sub-metric-val {
+        font-size: 24px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.2;
+    }
+    .sub-metric-calc {
+        font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
     .status { border-radius: 12px; padding: 13px 18px; margin: 6px 0 12px; font-size: 16px; font-weight: 850; line-height: 1.5; }
@@ -227,7 +248,6 @@ st.markdown(
     /* ==================================================
        [폰트 확대 & 여백 압축] 04, 06, 07번 내부 텍스트 가독성 강화
        ================================================== */
-    /* 04번: 수평 비교 스트립 (패딩은 줄이고 글씨는 1.5~2px 확대) */
     .cmp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
@@ -246,7 +266,6 @@ st.markdown(
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번: 3개년 입시 결과 요약 카드 (430px 높이 안에서 글씨 최대 확대) */
     .yr-card-list { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
     .yr-card {
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
@@ -268,7 +287,6 @@ st.markdown(
     .yr-m-lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px; }
     .yr-m-val { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.25; }
 
-    /* 07-①번: 3단 칸반 보드 (폰트 전반적 확대) */
     .kb-header {
         display: flex; align-items: center; justify-content: space-between;
         padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 17px;
@@ -295,7 +313,6 @@ st.markdown(
     .kb-scores b { color: var(--navy); font-weight: 850; font-size: 14.5px; }
     .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 800; }
 
-    /* 07-②번: 모집단위 스펙 비교 플랫 카드 (폰트 전반적 확대) */
     .spec-card {
         background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px;
         overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px; margin-bottom: 8px;
@@ -325,7 +342,7 @@ st.markdown(
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
         .rule-item { min-width: 100%; }
-        .score-hero { padding: 20px; }
+        .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
     }
 </style>
@@ -750,7 +767,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역: height=495 유지 + 폰트 확대)
+# 7. 결과 출력 (03번 드롭다운 펼침 시 한 화면 완벽 수용)
 # ==================================================
 result = st.session_state.result
 
@@ -775,47 +792,55 @@ with result_col:
     with st.container(border=True, height=495):
         section_title("03", "환산 점수")
 
+        first_name, first_score = result["first"]
+        second_name, second_score = result["second"]
+
+        # [핵심 수정] 학과 산출성적 박스 슬림화(하단 문구 1줄 통합) + 60%/40% 점수 옆에 계산식 인라인 배치
         st.markdown(
             f"""
             <div class="score-hero">
                 <div class="score-label">{escape(selected_dept)}</div>
                 <div class="score-number">{result["score"]:.2f} <small>점</small></div>
                 <div class="score-footer">
-                    100점 기준 환산값<br>
-                    1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
+                    100점 기준 환산값 &nbsp;·&nbsp; 1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
+                </div>
+            </div>
+            <div class="sub-metric-grid">
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">60% 반영 · {escape(first_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{first_score * 0.6:.2f}</span>
+                        <span class="sub-metric-calc">({first_score:.2f} × 60%)</span>
+                    </div>
+                </div>
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">40% 반영 · {escape(second_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{second_score * 0.4:.2f}</span>
+                        <span class="sub-metric-calc">({second_score:.2f} × 40%)</span>
+                    </div>
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        first_name, first_score = result["first"]
-        second_name, second_score = result["second"]
-
-        f_col, s_col = st.columns(2)
-        with f_col:
-            st.metric(f"60% 반영 · {first_name}", f"{first_score * 0.6:.2f}")
-            st.caption(f"{first_score:.2f} × 60%")
-        with s_col:
-            st.metric(f"40% 반영 · {second_name}", f"{second_score * 0.4:.2f}")
-            st.caption(f"{second_score:.2f} × 40%")
-
         with st.expander("산출 근거 자세히 보기"):
             st.markdown(
                 f"""
-                <div class="cmp-list" style="margin-top:2px;">
-                    <div class="cmp-row" style="padding:10px 14px;">
-                        <span class="cmp-lbl">60% 반영 ({escape(first_name)})</span>
+                <div class="cmp-list" style="margin-top:0px; gap:6px;">
+                    <div class="cmp-row" style="padding:7px 14px;">
+                        <span class="cmp-lbl" style="font-size:14px;">60% 반영 ({escape(first_name)})</span>
                         <div class="cmp-val-group">
-                            <span style="font-size:13.5px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
-                            <span class="cmp-score">{first_score * 0.6:.2f}점</span>
+                            <span style="font-size:13px; color:var(--muted);">환산 {first_score:.2f}점 × 60%</span>
+                            <span class="cmp-score" style="font-size:16px;">{first_score * 0.6:.2f}점</span>
                         </div>
                     </div>
-                    <div class="cmp-row" style="padding:10px 14px;">
-                        <span class="cmp-lbl">40% 반영 ({escape(second_name)})</span>
+                    <div class="cmp-row" style="padding:7px 14px;">
+                        <span class="cmp-lbl" style="font-size:14px;">40% 반영 ({escape(second_name)})</span>
                         <div class="cmp-val-group">
-                            <span style="font-size:13.5px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
-                            <span class="cmp-score">{second_score * 0.4:.2f}점</span>
+                            <span style="font-size:13px; color:var(--muted);">환산 {second_score:.2f}점 × 40%</span>
+                            <span class="cmp-score" style="font-size:16px;">{second_score * 0.4:.2f}점</span>
                         </div>
                     </div>
                 </div>
@@ -1297,7 +1322,6 @@ if not db.empty and data_scale and result is not None:
                         av_v = display_number(yr_info.get("평균"))
                         mn_v = display_number(yr_info.get("최저"))
 
-                        # 07-②번 내부에서 인라인으로 고정되어 있던 14px를 16px로 확대
                         card_html += (
                             f'<div class="spec-yr-box">'
                             f'<div class="spec-yr-head">'
@@ -1315,3 +1339,8 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
