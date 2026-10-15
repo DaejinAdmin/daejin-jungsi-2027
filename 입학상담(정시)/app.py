@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03/04 높이 일치 + 04 최고/최저 컬러 매칭 + 05번 높이 보정)
+# 2. 디자인 (03/04 높이 유지 + 04 최고/최저 컬러 매칭 + 05/06 높이 대칭)
 # ==================================================
 st.markdown(
     """
@@ -124,8 +124,8 @@ st.markdown(
         margin-bottom: 16px;
     }
 
-    /* 05번 영역 전용 고정 높이 래퍼 (06번과 바닥선 일치용) */
-    .master-card-05 {
+    /* 05, 06번 마스터 카드 (높이 440px 고정 대칭으로 05/06 높이 완벽 일치) */
+    .master-card-056 {
         background-color: #FFFFFF;
         border: 1px solid var(--line);
         border-radius: 16px;
@@ -139,7 +139,7 @@ st.markdown(
         overflow: hidden;
     }
 
-    /* 04번 상단 3열 최고/평균/최저 메트릭 */
+    /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
     .top3-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -354,29 +354,30 @@ st.markdown(
     div[data-testid="stHorizontalBlock"] { align-items: stretch; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* 06번 3개년 요약 카드 (기존 원본 스타일 유지) */
+    /* 06번 3개년 요약 카드 (05번 차트 박스와 440px 높이 완벽 일치) */
     .yr-card-list {
-        display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 2px;
     }
     .yr-card {
+        flex: 1; display: flex; flex-direction: column; justify-content: center;
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 14px 16px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 8px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
     .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
-        font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+        font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 6px;
         background: #FFFFFF; border: 1px solid var(--line); color: var(--muted);
     }
-    .yr-tag b { color: var(--navy); font-weight: 800; }
+    .yr-tag b { color: var(--navy); font-weight: 850; }
     .yr-metrics {
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 9px; padding: 9px 12px; text-align: center;
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 6px 10px; text-align: center;
     }
-    .yr-m-lbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
-    .yr-m-val { font-size: 15px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .yr-m-lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px; }
+    .yr-m-val { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.25; }
 
     /* 07번 칸반 보드 & 스펙 카드 */
     .kb-header {
@@ -423,11 +424,11 @@ st.markdown(
     .spec-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFE; }
     .spec-yr-box { background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
     .spec-yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .spec-yr-name { font-size: 13.5px; font-weight: 800; color: var(--navy); }
-    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
-    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700; }
+    .spec-yr-name { font-size: 15px; font-weight: 850; color: var(--navy); }
+    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
+    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; }
 
     [data-testid="stAlert"] { border-radius: 10px; }
 
@@ -436,7 +437,7 @@ st.markdown(
         .rule-item { min-width: 100%; }
         .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
-        .master-card, .master-card-05 { height: auto; }
+        .master-card, .master-card-056 { height: auto; }
     }
 </style>
 """,
@@ -1056,6 +1057,7 @@ with comparison_col:
                 )
             strip_html += '</div>'
 
+            # [핵심 수정] 04번 최고점(top3-max), 평균점(top3-avg), 최저점(top3-min)에 파란색 및 초록색 컬러 타이포 적용
             st.markdown(
                 f"""
                 <div class="master-card">
@@ -1090,19 +1092,16 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (06번은 원본 유지, 05번만 높이 440px 고정으로 대칭 맞춤)
+# 8. 결과 출력 (05, 06번 영역: master-card-056으로 높이 440px 완벽 대칭 동기화)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # [핵심 수정] 05번만 .master-card-05(높이 440px)로 감싸서 06번 카드 박스와 높이를 정확히 일치시킴
+        # [핵심 수정] 05번도 06번과 동일한 .master-card-056(높이 440px 고정)으로 감싸 양쪽 바닥선을 완벽히 일치시킴
         with st.container(border=True):
             st.markdown(
-                f"""
-                <div class="master-card-05">
-                    <div class="section-title"><span class="step">05</span>최근 3개년 점수 분포</div>
-                """,
+                '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
                 unsafe_allow_html=True,
             )
 
@@ -1159,7 +1158,7 @@ if not history.empty:
                             titleFontSize=12,
                             titleFontWeight=600,
                             titleColor="#64708A",
-                            titlePadding=10,
+                            titlePadding=14,
                             labelFontSize=11,
                             labelColor="#64708A",
                             tickCount=6,
@@ -1236,8 +1235,8 @@ if not history.empty:
                 chart = (
                     alt.layer(range_rule, min_point, max_point, avg_point, min_txt, max_txt, my_line)
                     .properties(
-                        height=245,
-                        padding={"left": 8, "right": 24, "top": 4, "bottom": 0},
+                        height=280,
+                        padding={"left": 8, "right": 24, "top": 10, "bottom": 2},
                     )
                     .configure_view(stroke=None, fill="#FFFFFF")
                     .configure_axis(
@@ -1249,49 +1248,53 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:0px;font-size:12px;line-height:1.3;'>"
+                    "<div style='width:100%;text-align:center;margin-top:0px;font-size:12.5px;line-height:1.4;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
                     "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
-                    "</div>"
                     "</div>",
                     unsafe_allow_html=True,
                 )
 
     with table_col:
-        # [원복 완료] 06번은 기존 원본 스타일(클래스 없는 기본 st.container 컨테이너) 그대로 유지하여 흰색 배경과 오리지널 높이 보존
-        with st.container(border=True):
-            section_title("06", "3개년 입시 결과")
+        sorted_hist = history.sort_values("연도", ascending=False)
+        cards_html = '<div class="yr-card-list">'
+        for _, h_row in sorted_hist.iterrows():
+            yr_label = f"{escape(str(h_row['연도']))}학년도"
+            mx_s = display_number(h_row["최고"])
+            av_s = display_number(h_row["평균"])
+            mn_s = display_number(h_row["최저"])
+            comp_s = escape(display_ratio(h_row["경쟁률"]))
+            add_s = escape(display_count(h_row["추가합격"]))
+            if add_s != "—" and not add_s.endswith("명"):
+                add_s += "명"
 
-            sorted_hist = history.sort_values("연도", ascending=False)
-            cards_html = '<div class="yr-card-list">'
-            for _, h_row in sorted_hist.iterrows():
-                yr_label = f"{escape(str(h_row['연도']))}학년도"
-                mx_s = display_number(h_row["최고"])
-                av_s = display_number(h_row["평균"])
-                mn_s = display_number(h_row["최저"])
-                comp_s = escape(display_ratio(h_row["경쟁률"]))
-                add_s = escape(display_count(h_row["추가합격"]))
-                if add_s != "—" and not add_s.endswith("명"):
-                    add_s += "명"
+            cards_html += (
+                f'<div class="yr-card">'
+                f'<div class="yr-head">'
+                f'<span class="yr-title">{yr_label}</span>'
+                f'<div class="yr-tags">'
+                f'<span class="yr-tag">경쟁률 <b>{comp_s}</b></span>'
+                f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
+                f'</div></div>'
+                f'<div class="yr-metrics">'
+                f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
+                f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
+                f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
+                f'</div></div>'
+            )
+        cards_html += '</div>'
 
-                cards_html += (
-                    f'<div class="yr-card">'
-                    f'<div class="yr-head">'
-                    f'<span class="yr-title">{yr_label}</span>'
-                    f'<div class="yr-tags">'
-                    f'<span class="yr-tag">경쟁률 <b>{comp_s}</b></span>'
-                    f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
-                    f'</div></div>'
-                    f'<div class="yr-metrics">'
-                    f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
-                    f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
-                    f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
-                    f'</div></div>'
-                )
-            cards_html += '</div>'
-            st.markdown(cards_html, unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div class="master-card-056">
+                <div class="section-title"><span class="step">06</span>3개년 입시 결과</div>
+                {cards_html}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 # ==================================================
 # 9. 모집단위 추천 및 모집단위 비교
@@ -1507,3 +1510,8 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
