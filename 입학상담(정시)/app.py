@@ -68,7 +68,7 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (st.container(height) 폐기 -> 무스크롤 마스터 카드 적용)
+# 2. 디자인 (03번 원본 사이즈 100% 복원 + 컨테이너 525px 확장)
 # ==================================================
 st.markdown(
     """
@@ -98,41 +98,16 @@ st.markdown(
         border-radius: 16px !important;
         box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
     }
-
-    /* [핵심 해결책] 03, 04번을 감싸는 무스크롤 순수 HTML 마스터 카드 (양쪽 555px 완벽 일치) */
-    .master-card {
-        background: #FFFFFF;
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 20px 22px;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
-        min-height: 555px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        margin-bottom: 16px;
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stVerticalBlockBorderWrapper"] * {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
     }
-
-    /* 04번 상단 3열 최고/평균/최저 메트릭 (st.metric 대체용 HTML) */
-    .top3-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin: 4px 0 10px;
-    }
-    .top3-lbl {
-        color: var(--muted);
-        font-size: 13.5px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    .top3-val {
-        color: var(--navy);
-        font-size: clamp(22px, 2.1vw, 29px);
-        font-weight: 850;
-        font-variant-numeric: tabular-nums;
-        line-height: 1.2;
+    [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar,
+    [data-testid="stVerticalBlockBorderWrapper"] *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
 
     [data-testid="stImage"] img {
@@ -183,6 +158,15 @@ st.markdown(
         border-color: var(--navy) !important; background: var(--tint) !important;
     }
 
+    [data-testid="stMetricLabel"] p {
+        color: var(--muted) !important; font-size: 13.5px !important;
+        font-weight: 700 !important; line-height: 1.4 !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: var(--navy) !important; font-size: clamp(22px, 2.1vw, 29px) !important;
+        font-weight: 850 !important; font-variant-numeric: tabular-nums;
+    }
+
     .eyebrow { color: var(--primary); font-size: 11px; font-weight: 850; letter-spacing: 1.8px; margin-bottom: 5px; }
     .page-title {
         color: #000000; font-size: clamp(26px, 3vw, 38px); font-weight: 900;
@@ -190,7 +174,7 @@ st.markdown(
     }
     .section-title {
         display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 0px 0 12px;
+        font-size: 20px; font-weight: 850; margin: 2px 0 10px;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
@@ -212,11 +196,11 @@ st.markdown(
     }
     .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
 
-    /* 03번 상단 학과 산출성적(score-hero) 시원한 원본 크기 그대로 유지 */
+    /* [원복 완료] 03번 상단 학과 산출성적(score-hero) 아까의 시원한 원본 크기 그대로 복원 */
     .score-hero {
         position: relative; overflow: hidden;
         background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 16px; padding: 18px 24px; color: #FFFFFF; margin-bottom: 12px;
+        border-radius: 16px; padding: 16px 22px; color: #FFFFFF; margin-bottom: 12px;
         box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18);
     }
     .score-hero::after {
@@ -225,7 +209,7 @@ st.markdown(
     }
     .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
     .score-number {
-        font-size: clamp(36px, 3.5vw, 50px); font-weight: 900; letter-spacing: -1.5px;
+        font-size: clamp(34px, 3.4vw, 48px); font-weight: 900; letter-spacing: -1.5px;
         line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
         text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
@@ -235,12 +219,12 @@ st.markdown(
         color: #C3CEEA; font-size: 13px; line-height: 1.4;
     }
 
-    /* 03번 중단 60%, 40% 인라인 요약 박스 */
+    /* [원복 완료] 03번 중단 60%, 40% 인라인 요약 박스 원본 크기 복원 */
     .sub-metric-grid {
         display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;
     }
     .sub-metric-box {
-        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px;
+        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px;
     }
     .sub-metric-lbl {
         font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
@@ -255,17 +239,17 @@ st.markdown(
         font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
-    /* 03번 하단: 전 영역 환산 및 반영 판정 보드 */
+    /* [원복 완료] 03번 하단: 전 영역 환산 및 반영 판정 보드 원본 크기 복원 */
     .audit-header {
         font-size: 13px; font-weight: 800; color: var(--muted); margin: 2px 0 7px 2px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .audit-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 2px;
     }
     .audit-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 9px 13px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
+        padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
         font-size: 13.5px;
     }
     .audit-item.active-60 {
@@ -286,18 +270,18 @@ st.markdown(
     .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
     .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2.5px 7px; border-radius: 5px; }
 
-    .status { border-radius: 12px; padding: 15px 18px; margin: 12px 0 14px; font-size: 16px; font-weight: 850; line-height: 1.55; }
+    /* 04번 요소들도 525px 컨테이너에 맞춰 여유 있게 밸런스 조정 */
+    .status { border-radius: 12px; padding: 15px 18px; margin: 8px 0 14px; font-size: 16px; font-weight: 850; line-height: 1.55; }
     .empty-state {
         text-align: center; padding: 50px 20px; background: #FFFFFF;
         border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
     }
     .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
 
-    div[data-testid="stHorizontalBlock"] { align-items: stretch; }
+    div[data-testid="stHorizontalBlock"] { align-items: flex-start; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* 04번 비교 스트립 */
-    .cmp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .cmp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
     .cmp-row {
         display: flex; align-items: center; justify-content: space-between;
         padding: 16px 18px; background: #F8FAFE; border: 1px solid var(--line);
@@ -315,14 +299,13 @@ st.markdown(
     .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
     .pill-same { background: #E9EDF8; color: var(--navy); }
 
-    /* 06번 3개년 요약 카드 (05번 차트 높이와 정확히 대칭되도록 설정) */
-    .yr-card-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+    .yr-card-list { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
     .yr-card {
         background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 9px 14px; transition: all 0.15s ease;
+        border-radius: 12px; padding: 8px 14px; transition: all 0.15s ease;
     }
     .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
     .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
@@ -337,7 +320,6 @@ st.markdown(
     .yr-m-lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px; }
     .yr-m-val { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.25; }
 
-    /* 07번 칸반 보드 & 스펙 카드 */
     .kb-header {
         display: flex; align-items: center; justify-content: space-between;
         padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 17px;
@@ -395,7 +377,6 @@ st.markdown(
         .rule-item { min-width: 100%; }
         .score-hero { padding: 16px; }
         .section-title { font-size: 18px; }
-        .master-card { min-height: auto; }
     }
 </style>
 """,
@@ -872,7 +853,7 @@ with st.container(border=True):
             )
 
 # ==================================================
-# 7. 결과 출력 (03, 04번 영역: st.container(height) 완전 폐기 -> 무스크롤 마스터 카드)
+# 7. 결과 출력 (03번 원본 크기 100% 복원 + 컨테이너 525px 확장으로 스크롤 제거)
 # ==================================================
 result = st.session_state.result
 
@@ -894,174 +875,163 @@ history = build_history(record) if record is not None and data_scale else pd.Dat
 result_col, comparison_col = st.columns([6, 4], gap="large")
 
 with result_col:
-    first_name, first_score = result["first"]
-    second_name, second_score = result["second"]
+    # [핵심 수정] 내부를 줄이는 대신 컨테이너 높이를 525로 늘려 아까의 시원한 크기를 그대로 수용
+    with st.container(border=True, height=525):
+        section_title("03", "환산 점수")
 
-    audit_cards_html = ""
-    for s_item in result["all_subjects"]:
-        role = s_item["role"]
-        if role == "60% 반영":
-            item_cls, badge_html = "active-60", '<span class="tag-60">60% 반영</span>'
-        elif role == "40% 반영":
-            item_cls, badge_html = "active-40", '<span class="tag-40">40% 반영</span>'
-        elif role == "탐구상위":
-            item_cls, badge_html = "dropped", '<span class="tag-drop">후보(미반영)</span>'
-        else:
-            item_cls, badge_html = "dropped", '<span class="tag-drop">미반영</span>'
+        first_name, first_score = result["first"]
+        second_name, second_score = result["second"]
 
-        audit_cards_html += (
-            f'<div class="audit-item {item_cls}">'
-            f'<div class="audit-left">'
-            f'<span class="audit-subj">{escape(s_item["title"])}</span>'
-            f'<span class="audit-raw">{escape(s_item["raw"])}</span>'
-            f'</div>'
-            f'<div class="audit-right">'
-            f'<span class="audit-conv">{s_item["conv"]:.2f}점</span>'
-            f'{badge_html}'
-            f'</div></div>'
-        )
-
-    # [핵심] st.container(height)를 쓰지 않고 단일 HTML 마스터 카드로 렌더링하여 스크롤바 원천 차단
-    st.markdown(
-        f"""
-        <div class="master-card">
-            <div>
-                <div class="section-title"><span class="step">03</span>환산 점수</div>
-                <div class="score-hero">
-                    <div class="score-label">{escape(selected_dept)}</div>
-                    <div class="score-number">{result["score"]:.2f} <small>점</small></div>
-                    <div class="score-footer">
-                        100점 기준 환산값 &nbsp;·&nbsp; 1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
-                    </div>
-                </div>
-                <div class="sub-metric-grid">
-                    <div class="sub-metric-box">
-                        <div class="sub-metric-lbl">60% 반영 · {escape(first_name)}</div>
-                        <div class="sub-metric-val-row">
-                            <span class="sub-metric-val">{first_score * 0.6:.2f}</span>
-                            <span class="sub-metric-calc">({first_score:.2f} × 60%)</span>
-                        </div>
-                    </div>
-                    <div class="sub-metric-box">
-                        <div class="sub-metric-lbl">40% 반영 · {escape(second_name)}</div>
-                        <div class="sub-metric-val-row">
-                            <span class="sub-metric-val">{second_score * 0.4:.2f}</span>
-                            <span class="sub-metric-calc">({second_score:.2f} × 40%)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div class="audit-header">
-                    <span>전 영역 환산 및 반영 판정 내역</span>
-                    <span style="font-weight:600; font-size:11.5px;">가산점·등급 환산 적용 후 상위 2개 영역 자동 채택</span>
-                </div>
-                <div class="audit-grid">
-                    {audit_cards_html}
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with comparison_col:
-    if record is not None and not data_scale and not db.empty:
-        with st.container(border=True):
-            section_title("04", "전년도 입시 결과 비교")
-            st.warning("점수 단위를 판별하지 못해 비교를 표시하지 않습니다.")
-    elif history.empty:
-        with st.container(border=True):
-            section_title("04", "전년도 입시 결과 비교")
-            st.info("비교할 입시 결과 데이터가 없습니다.")
-    else:
-        recent = history[history["연도"] == "2026"].iloc[0]
-        max_score = to_number(recent["최고"])
-        avg_score = to_number(recent["평균"])
-        cut_score = to_number(recent["최저"])
-
-        valid_history = all(
-            v is not None and 0 <= v <= 1000
-            for v in (max_score, avg_score, cut_score)
-        )
-        ordered_history = valid_history and max_score >= avg_score >= cut_score
-
-        if ordered_history:
-            score = result["score"]
-
-            if score >= max_score:
-                msg, bg, c = "전년도 최고점 이상", "#E8F4F0", "#0B5A40"
-            elif score >= avg_score:
-                msg, bg, c = "전년도 평균점 이상", "#E9EDF8", "#082070"
-            elif score >= cut_score:
-                msg, bg, c = "전년도 최저점 이상 · 평균점 미만", "#FEF4E6", "#96520B"
+        audit_cards_html = ""
+        for s_item in result["all_subjects"]:
+            role = s_item["role"]
+            if role == "60% 반영":
+                item_cls, badge_html = "active-60", '<span class="tag-60">60% 반영</span>'
+            elif role == "40% 반영":
+                item_cls, badge_html = "active-40", '<span class="tag-40">40% 반영</span>'
+            elif role == "탐구상위":
+                item_cls, badge_html = "dropped", '<span class="tag-drop">후보(미반영)</span>'
             else:
-                msg, bg, c = "전년도 최저점 미만", "#FDEEEF", "#9F1A2C"
+                item_cls, badge_html = "dropped", '<span class="tag-drop">미반영</span>'
 
-            strip_html = '<div class="cmp-list">'
-            for lbl, target in [("2026 최고점 기준", max_score), ("2026 평균점 기준", avg_score), ("2026 최저점 기준", cut_score)]:
-                diff = score - target
-                if abs(diff) < 0.005:
-                    b_cls, b_txt = "pill-same", "동일 (0.00)"
-                elif diff > 0:
-                    b_cls, b_txt = "pill-plus", f"+{diff:,.2f}점 초과"
-                else:
-                    b_cls, b_txt = "pill-minus", f"-{abs(diff):,.2f}점 부족"
-
-                strip_html += (
-                    f'<div class="cmp-row">'
-                    f'<span class="cmp-lbl">{lbl}</span>'
-                    f'<div class="cmp-val-group">'
-                    f'<span class="cmp-score">{target:,.2f}점</span>'
-                    f'<span class="pill-badge {b_cls}">{b_txt}</span>'
-                    f'</div></div>'
-                )
-            strip_html += '</div>'
-
-            # [핵심] 04번도 동일한 .master-card(min-height: 555px)로 렌더링하여 03번과 1px 오차 없이 높이 일치
-            st.markdown(
-                f"""
-                <div class="master-card">
-                    <div>
-                        <div class="section-title"><span class="step">04</span>전년도 입시 결과 비교</div>
-                        <div class="top3-grid">
-                            <div><div class="top3-lbl">2026 최고점</div><div class="top3-val">{display_number(max_score)}</div></div>
-                            <div><div class="top3-lbl">2026 평균점</div><div class="top3-val">{display_number(avg_score)}</div></div>
-                            <div><div class="top3-lbl">2026 최저점</div><div class="top3-val">{display_number(cut_score)}</div></div>
-                        </div>
-                        <div class="status" style="background:{bg}; color:{c};">
-                            {msg}<br>
-                            <span style="font-size:14.5px; font-weight:750;">
-                                전년도 평균 대비 {score - avg_score:+.2f}점
-                            </span>
-                        </div>
-                    </div>
-                    {strip_html}
-                </div>
-                """,
-                unsafe_allow_html=True,
+            audit_cards_html += (
+                f'<div class="audit-item {item_cls}">'
+                f'<div class="audit-left">'
+                f'<span class="audit-subj">{escape(s_item["title"])}</span>'
+                f'<span class="audit-raw">{escape(s_item["raw"])}</span>'
+                f'</div>'
+                f'<div class="audit-right">'
+                f'<span class="audit-conv">{s_item["conv"]:.2f}점</span>'
+                f'{badge_html}'
+                f'</div></div>'
             )
 
-        elif all(v is not None for v in (max_score, avg_score, cut_score)):
-            with st.container(border=True):
-                section_title("04", "전년도 입시 결과 비교")
+        st.markdown(
+            f"""
+            <div class="score-hero">
+                <div class="score-label">{escape(selected_dept)}</div>
+                <div class="score-number">{result["score"]:.2f} <small>점</small></div>
+                <div class="score-footer">
+                    100점 기준 환산값 &nbsp;·&nbsp; 1,000점 기준 <b>{result["score1000"]:,.2f}점</b>
+                </div>
+            </div>
+            <div class="sub-metric-grid">
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">60% 반영 · {escape(first_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{first_score * 0.6:.2f}</span>
+                        <span class="sub-metric-calc">({first_score:.2f} × 60%)</span>
+                    </div>
+                </div>
+                <div class="sub-metric-box">
+                    <div class="sub-metric-lbl">40% 반영 · {escape(second_name)}</div>
+                    <div class="sub-metric-val-row">
+                        <span class="sub-metric-val">{second_score * 0.4:.2f}</span>
+                        <span class="sub-metric-calc">({second_score:.2f} × 40%)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="audit-header">
+                <span>전 영역 환산 및 반영 판정 내역</span>
+                <span style="font-weight:600; font-size:11.5px;">가산점·등급 환산 적용 후 상위 2개 영역 자동 채택</span>
+            </div>
+            <div class="audit-grid">
+                {audit_cards_html}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+with comparison_col:
+    with st.container(border=True, height=525):
+        section_title("04", "전년도 입시 결과 비교")
+
+        if record is not None and not data_scale and not db.empty:
+            st.warning("점수 단위를 판별하지 못해 비교를 표시하지 않습니다.")
+        elif history.empty:
+            st.info("비교할 입시 결과 데이터가 없습니다.")
+        else:
+            recent = history[history["연도"] == "2026"].iloc[0]
+            max_score = to_number(recent["최고"])
+            avg_score = to_number(recent["평균"])
+            cut_score = to_number(recent["최저"])
+
+            m_cols = st.columns(3)
+            for col, lbl, val in zip(
+                m_cols,
+                ["2026 최고점", "2026 평균점", "2026 최저점"],
+                [max_score, avg_score, cut_score],
+            ):
+                with col:
+                    st.metric(lbl, display_number(val))
+
+            valid_history = all(
+                v is not None and 0 <= v <= 1000
+                for v in (max_score, avg_score, cut_score)
+            )
+            ordered_history = valid_history and max_score >= avg_score >= cut_score
+
+            if ordered_history:
+                score = result["score"]
+
+                if score >= max_score:
+                    msg, bg, c = "전년도 최고점 이상", "#E8F4F0", "#0B5A40"
+                elif score >= avg_score:
+                    msg, bg, c = "전년도 평균점 이상", "#E9EDF8", "#082070"
+                elif score >= cut_score:
+                    msg, bg, c = "전년도 최저점 이상 · 평균점 미만", "#FEF4E6", "#96520B"
+                else:
+                    msg, bg, c = "전년도 최저점 미만", "#FDEEEF", "#9F1A2C"
+
+                st.markdown(
+                    f"""
+                    <div class="status" style="background:{bg}; color:{c};">
+                        {msg}<br>
+                        <span style="font-size:14.5px; font-weight:750;">
+                            전년도 평균 대비 {score - avg_score:+.2f}점
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                strip_html = '<div class="cmp-list">'
+                for lbl, target in [("2026 최고점 기준", max_score), ("2026 평균점 기준", avg_score), ("2026 최저점 기준", cut_score)]:
+                    diff = score - target
+                    if abs(diff) < 0.005:
+                        b_cls, b_txt = "pill-same", "동일 (0.00)"
+                    elif diff > 0:
+                        b_cls, b_txt = "pill-plus", f"+{diff:,.2f}점 초과"
+                    else:
+                        b_cls, b_txt = "pill-minus", f"-{abs(diff):,.2f}점 부족"
+
+                    strip_html += (
+                        f'<div class="cmp-row">'
+                        f'<span class="cmp-lbl">{lbl}</span>'
+                        f'<div class="cmp-val-group">'
+                        f'<span class="cmp-score">{target:,.2f}점</span>'
+                        f'<span class="pill-badge {b_cls}">{b_txt}</span>'
+                        f'</div></div>'
+                    )
+                strip_html += '</div>'
+                st.markdown(strip_html, unsafe_allow_html=True)
+
+            elif all(v is not None for v in (max_score, avg_score, cut_score)):
                 st.warning(
                     "2026년 최고·평균·최저 점수의 값 또는 순서가 올바르지 않아 "
                     "판정 문구를 표시하지 않습니다. 원본 입시 결과 자료를 확인해 주세요."
                 )
-        else:
-            with st.container(border=True):
-                section_title("04", "전년도 입시 결과 비교")
+            else:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역: height 옵션 없이 자연 대칭)
+# 8. 결과 출력 (05, 06번 영역: height=430 유지 + 폰트 확대)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        with st.container(border=True):
+        with st.container(border=True, height=430):
             section_title("05", "최근 3개년 점수 분포")
 
             c_data = history[["연도", "최고", "평균", "최저"]].copy()
@@ -1207,7 +1177,7 @@ if not history.empty:
                 st.altair_chart(chart, use_container_width=True)
 
                 st.markdown(
-                    "<div style='width:100%;text-align:center;margin-top:2px;padding-bottom:6px;font-size:12.5px;line-height:1.5;'>"
+                    "<div style='width:100%;text-align:center;margin-top:2px;font-size:12.5px;line-height:1.5;'>"
                     "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
                     "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
                     "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
@@ -1217,11 +1187,11 @@ if not history.empty:
                 )
 
     with table_col:
-        with st.container(border=True):
+        with st.container(border=True, height=430):
             section_title("06", "3개년 입시 결과")
 
             sorted_hist = history.sort_values("연도", ascending=False)
-            cards_html = '<div class="yr-card-list" style="padding-bottom:4px;">'
+            cards_html = '<div class="yr-card-list">'
             for _, h_row in sorted_hist.iterrows():
                 yr_label = f"{escape(str(h_row['연도']))}학년도"
                 mx_s = display_number(h_row["최고"])
@@ -1250,7 +1220,7 @@ if not history.empty:
             st.markdown(cards_html, unsafe_allow_html=True)
 
 # ==================================================
-# 9. 모집단위 추천 및 모집단위 비교
+# 9. 모집단위 추천 및 모집단위 비교 (타이포그래피 확대 유지)
 # ==================================================
 if not db.empty and data_scale and result is not None:
     st.divider()
