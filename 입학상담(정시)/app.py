@@ -229,8 +229,9 @@ st.markdown(
         font-size: 11.5px; font-weight: 700; letter-spacing: 0px; margin-bottom: 6px;
     }
     .page-title {
-        color: #0F172A; font-size: clamp(24px, 2.6vw, 32px); font-weight: 850;
-        letter-spacing: -0.8px; line-height: 1.25; margin-top: 0px;
+        color: #0F172A; font-size: clamp(24px, 2.8vw, 34px); font-weight: 850;
+        letter-spacing: -0.8px; line-height: 1.25; margin: 0;
+        text-align: center;
     }
     .section-title {
         display: flex; align-items: center; gap: 8px; color: #0F172A;
@@ -751,9 +752,12 @@ def build_history(record):
 
 
 # ==================================================
-# 6. 헤더 및 입력 영역
+# 6. 헤더 및 입력 영역 (수직·수평 정중앙 배치)
 # ==================================================
-head_c1, head_c2 = st.columns([0.8, 9.2])
+try:
+    head_c1, head_c2, head_c3 = st.columns([0.8, 8.4, 0.8], vertical_alignment="center")
+except TypeError:
+    head_c1, head_c2, head_c3 = st.columns([0.8, 8.4, 0.8])
 
 with head_c1:
     logo_png = BASE_DIR / "logo.png"
@@ -765,8 +769,9 @@ with head_c1:
 
 with head_c2:
     st.markdown(
-        """<div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>""",
-        unsafe_allow_html=True,)
+        '<div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>',
+        unsafe_allow_html=True,
+    )
 
 st.markdown(
     """
@@ -1514,8 +1519,3 @@ if not db.empty and data_scale and result is not None:
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
-
-st.caption(
-    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 정시 모집요강과 "
-    "대학의 공식 안내를 기준으로 하세요."
-)
