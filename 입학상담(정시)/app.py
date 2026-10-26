@@ -766,7 +766,6 @@ with head_c1:
 with head_c2:
     st.markdown(
         """
-        <div class="eyebrow">대진대학교 입학처 공식 상담 시스템</div>
         <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
         """,
         unsafe_allow_html=True,
