@@ -1,6 +1,6 @@
 import math
-import re
 import os
+import re
 from html import escape
 from pathlib import Path
 
@@ -68,14 +68,14 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # ==================================================
-# 2. 디자인 (03/04 높이 유지 + 04 최고/최저 컬러 매칭 + 05/06 높이 대칭)
+# 2. 디자인 (AI 클리셰 제거 · 대학 공식 엔터프라이즈 플랫 UI)
 # ==================================================
 st.markdown(
     """
 <style>
     :root {
-        --navy: #082070; --navy-deep: #051550; --primary: #1D3FA0; --tint: #E9EDF8;
-        --silver: #D8E0E8; --text: #1B2440; --muted: #55607A; --line: #DDE3F0; --bg: #F3F5FB;
+        --navy: #0F2557; --navy-deep: #091738; --primary: #1E40AF; --tint: #F1F5F9;
+        --silver: #E2E8F0; --text: #0F172A; --muted: #475569; --line: #CBD5E1; --bg: #F8FAFC;
     }
     #MainMenu, footer, header { visibility: hidden; }
     .stApp {
@@ -83,20 +83,20 @@ st.markdown(
         font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
     }
     .stApp::before {
-        content: ""; position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 999999;
-        background: linear-gradient(90deg, var(--navy-deep), var(--navy) 50%, var(--primary));
+        content: ""; position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 999999;
+        background: var(--navy);
     }
     .block-container {
-        max-width: 1480px; padding-top: 2.6rem; padding-bottom: 2.4rem;
+        max-width: 1480px; padding-top: 2.2rem; padding-bottom: 2.4rem;
         padding-left: clamp(1rem, 2.5vw, 2.2rem); padding-right: clamp(1rem, 2.5vw, 2.2rem);
     }
-    h1, h2, h3, h4 { color: var(--navy) !important; letter-spacing: -0.5px; }
+    h1, h2, h3, h4 { color: var(--text) !important; letter-spacing: -0.4px; }
 
     [data-testid="stVerticalBlockBorderWrapper"] {
         background: #FFFFFF;
         border: 1px solid var(--line) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        border-radius: 8px !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
     }
     [data-testid="stVerticalBlockBorderWrapper"],
     [data-testid="stVerticalBlockBorderWrapper"] * {
@@ -110,13 +110,14 @@ st.markdown(
         height: 0 !important;
     }
 
-    /* 03, 04번 마스터 카드 (높이 565px 고정 대칭) */
+    /* 03, 04번 마스터 카드 (높이 565px 고정 대칭 · 엔터프라이즈 상단 보더) */
     .master-card {
         background-color: #FFFFFF;
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-top: 3px solid var(--navy);
+        border-radius: 8px;
         padding: 20px 22px;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
         height: 565px;
         box-sizing: border-box;
         display: flex;
@@ -124,13 +125,14 @@ st.markdown(
         margin-bottom: 16px;
     }
 
-    /* 05, 06번 마스터 카드 (높이 440px 고정 대칭으로 05/06 높이 완벽 일치) */
+    /* 05, 06번 마스터 카드 (높이 440px 고정 대칭) */
     .master-card-056 {
         background-color: #FFFFFF;
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-top: 3px solid var(--navy);
+        border-radius: 8px;
         padding: 20px 22px;
-        box-shadow: 0 3px 10px rgba(8, 32, 112, 0.055);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
         height: 440px;
         box-sizing: border-box;
         display: flex;
@@ -139,152 +141,159 @@ st.markdown(
         overflow: hidden;
     }
 
-    /* 04번 상단 3열 최고/평균/최저 메트릭 (최고점 파란색, 최저점 초록색 타이포 통일) */
+    /* 04번 상단 3열 최고/평균/최저 메트릭 (구분선 그리드 적용) */
     .top3-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
+        gap: 0px;
         margin: 4px 0 14px;
-        background: #F8FAFE;
+        background: #F8FAFC;
         border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 12px 16px;
+        border-radius: 6px;
+        padding: 12px 0;
         flex-shrink: 0;
+    }
+    .top3-grid > div {
+        padding: 0 16px;
+        border-right: 1px solid var(--silver);
+    }
+    .top3-grid > div:last-child {
+        border-right: none;
     }
     .top3-lbl {
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 700;
-        margin-bottom: 3px;
+        margin-bottom: 4px;
     }
     .top3-val {
-        font-size: clamp(22px, 2vw, 27px);
-        font-weight: 850;
+        font-size: clamp(22px, 2vw, 26px);
+        font-weight: 800;
         font-variant-numeric: tabular-nums;
         line-height: 1.15;
     }
-    .top3-max { color: #3157C8; }
-    .top3-avg { color: var(--navy); }
-    .top3-min { color: #0F9D91; }
+    .top3-max { color: #1E40AF; }
+    .top3-avg { color: #0F172A; }
+    .top3-min { color: #047857; }
 
     [data-testid="stImage"] img {
-        background: #FFFFFF; padding: 6px; border-radius: 14px;
-        border: 1px solid var(--line); box-shadow: 0 4px 12px -4px rgba(8, 32, 112, 0.15);
+        background: #FFFFFF; padding: 4px; border-radius: 8px;
+        border: 1px solid var(--line);
     }
 
     [data-testid="stWidgetLabel"] p {
-        color: var(--navy) !important; font-size: 14px !important;
+        color: var(--text) !important; font-size: 13.5px !important;
         font-weight: 700 !important; line-height: 1.45 !important;
     }
     [data-testid="stWidgetLabel"] { min-height: 1.25rem; }
 
     [data-testid="stNumberInput"] input {
-        background: var(--tint) !important; border: 1px solid transparent !important;
-        color: var(--navy) !important; font-size: 18px !important; font-weight: 800 !important;
-        min-height: 44px; border-radius: 10px;
+        background: #FFFFFF !important; border: 1px solid var(--line) !important;
+        color: var(--text) !important; font-size: 17px !important; font-weight: 750 !important;
+        min-height: 42px; border-radius: 6px;
     }
     [data-testid="stNumberInput"] input:focus {
-        border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(29, 63, 160, 0.15) !important;
+        border-color: var(--navy) !important; box-shadow: 0 0 0 2px rgba(15, 37, 87, 0.12) !important;
     }
     [data-baseweb="select"] > div {
-        background: var(--tint) !important; border-color: transparent !important;
-        border-radius: 10px !important; color: var(--navy) !important;
-        min-height: 44px; font-weight: 600;
+        background: #FFFFFF !important; border: 1px solid var(--line) !important;
+        border-radius: 6px !important; color: var(--text) !important;
+        min-height: 42px; font-weight: 600;
     }
     [data-baseweb="select"] > div:focus-within {
-        border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(29, 63, 160, 0.15) !important;
+        border-color: var(--navy) !important; box-shadow: 0 0 0 2px rgba(15, 37, 87, 0.12) !important;
     }
 
     [data-testid="stButton"] button {
-        border-radius: 10px !important; min-height: 48px; font-weight: 750 !important;
-        letter-spacing: -0.3px; transition: all .15s ease;
+        border-radius: 6px !important; min-height: 46px; font-weight: 700 !important;
+        letter-spacing: -0.2px; transition: background .12s ease;
     }
     [data-testid="stButton"] button[kind="primary"] {
-        background: linear-gradient(135deg, var(--navy), var(--primary)) !important;
-        border: none !important; color: #FFFFFF !important;
-        box-shadow: 0 6px 16px rgba(8, 32, 112, 0.28);
+        background: var(--navy) !important;
+        border: 1px solid var(--navy) !important; color: #FFFFFF !important;
+        box-shadow: none !important;
     }
     [data-testid="stButton"] button[kind="primary"]:hover {
-        background: linear-gradient(135deg, var(--navy-deep), var(--navy)) !important;
-        transform: translateY(-1px);
+        background: var(--navy-deep) !important;
     }
     [data-testid="stButton"] button[kind="secondary"] {
-        border: 1px solid var(--line) !important; color: var(--navy) !important; background: #FFFFFF !important;
+        border: 1px solid var(--line) !important; color: var(--text) !important; background: #FFFFFF !important;
     }
     [data-testid="stButton"] button[kind="secondary"]:hover {
         border-color: var(--navy) !important; background: var(--tint) !important;
     }
 
-    .eyebrow { color: var(--primary); font-size: 11px; font-weight: 850; letter-spacing: 1.8px; margin-bottom: 5px; }
+    .eyebrow {
+        display: inline-block; background: var(--tint); color: var(--navy);
+        border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px;
+        font-size: 11.5px; font-weight: 700; letter-spacing: 0px; margin-bottom: 6px;
+    }
     .page-title {
-        color: #000000; font-size: clamp(26px, 3vw, 38px); font-weight: 900;
-        letter-spacing: -1.2px; line-height: 1.3; margin-top: -6px;
+        color: #0F172A; font-size: clamp(24px, 2.6vw, 32px); font-weight: 850;
+        letter-spacing: -0.8px; line-height: 1.25; margin-top: 0px;
     }
     .section-title {
-        display: flex; align-items: center; gap: 10px; color: var(--navy);
-        font-size: 20px; font-weight: 850; margin: 0px 0 12px; flex-shrink: 0;
+        display: flex; align-items: center; gap: 8px; color: #0F172A;
+        font-size: 17.5px; font-weight: 800; margin: 0px 0 12px;
+        padding-bottom: 8px; border-bottom: 1px solid var(--silver); flex-shrink: 0;
     }
     .step {
         display: inline-flex; align-items: center; justify-content: center;
-        width: 32px; height: 32px; border-radius: 9px;
-        background: linear-gradient(135deg, var(--navy), var(--primary));
-        color: #FFFFFF; font-size: 15px; font-weight: 900; flex-shrink: 0;
+        padding: 2px 7px; border-radius: 4px;
+        background: var(--navy); color: #FFFFFF; font-size: 12px; font-weight: 800; flex-shrink: 0;
     }
     .subject-title {
-        font-size: 15px; color: var(--navy); font-weight: 850;
-        border-left: 4px solid var(--primary); padding-left: 10px;
-        margin: 3px 0 10px; min-height: 23px; line-height: 1.5; box-sizing: border-box;
+        font-size: 14.5px; color: var(--text); font-weight: 800;
+        border-left: 3px solid var(--navy); padding-left: 8px;
+        margin: 3px 0 10px; min-height: 22px; line-height: 1.5; box-sizing: border-box;
     }
 
-    .rule-strip { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 22px; }
+    .rule-strip {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 18px;
+    }
     .rule-item {
-        flex: 1; min-width: 190px; padding: 16px 18px; border-radius: 12px;
-        font-size: 15px; color: var(--muted); line-height: 1.6;
-        background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--primary);
+        padding: 13px 16px; border-radius: 6px;
+        font-size: 13.5px; color: var(--muted); line-height: 1.55;
+        background: #FFFFFF; border: 1px solid var(--line); border-left: 3px solid var(--navy);
     }
-    .rule-item strong { font-size: 17px; color: var(--navy); margin-bottom: 6px; display: block; font-weight: 800; }
+    .rule-item strong { font-size: 14.5px; color: var(--text); margin-bottom: 3px; display: block; font-weight: 800; }
 
-    /* 03번 상단 학과 산출성적(score-hero) */
+    /* 03번 상단 학과 산출성적 (AI 빛무리 제거 · 솔리드 네이비 패널) */
     .score-hero {
-        position: relative; overflow: hidden;
-        background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--primary) 100%);
-        border-radius: 16px; padding: 18px 24px; color: #FFFFFF; margin-bottom: 12px;
-        box-shadow: 0 8px 18px rgba(8, 32, 112, 0.18); flex-shrink: 0;
+        background: var(--navy);
+        border: 1px solid var(--navy-deep);
+        border-radius: 6px; padding: 16px 20px; color: #FFFFFF; margin-bottom: 12px;
+        flex-shrink: 0;
     }
-    .score-hero::after {
-        content: ""; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px;
-        border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
-    }
-    .score-label { font-size: 14px; font-weight: 700; color: #C3CEEA; }
+    .score-label { font-size: 13px; font-weight: 600; color: #CBD5E1; }
     .score-number {
-        font-size: clamp(36px, 3.5vw, 48px); font-weight: 900; letter-spacing: -1.5px;
-        line-height: 1.1; margin: 4px 0 8px; font-variant-numeric: tabular-nums;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        font-size: clamp(32px, 3vw, 42px); font-weight: 850; letter-spacing: -1px;
+        line-height: 1.15; margin: 4px 0 6px; font-variant-numeric: tabular-nums;
     }
-    .score-number small { font-size: 18px; font-weight: 600; color: #C3CEEA; letter-spacing: 0; }
+    .score-number small { font-size: 16px; font-weight: 600; color: #CBD5E1; letter-spacing: 0; }
     .score-footer {
-        border-top: 1px solid rgba(255,255,255,0.18); padding-top: 8px;
-        color: #C3CEEA; font-size: 13px; line-height: 1.4;
+        border-top: 1px solid rgba(255,255,255,0.14); padding-top: 7px;
+        color: #E2E8F0; font-size: 12.5px; line-height: 1.4;
     }
 
     /* 03번 중단 60%, 40% 인라인 요약 박스 */
     .sub-metric-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; flex-shrink: 0;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; flex-shrink: 0;
     }
     .sub-metric-box {
-        background: #F8FAFE; border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px;
+        background: #F8FAFC; border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px;
     }
     .sub-metric-lbl {
-        font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
+        font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 3px;
     }
     .sub-metric-val-row {
-        display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+        display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
     }
     .sub-metric-val {
-        font-size: 24px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.2;
+        font-size: 21px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.2;
     }
     .sub-metric-calc {
-        font-size: 13px; font-weight: 650; color: var(--muted); font-variant-numeric: tabular-nums;
+        font-size: 12.5px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums;
     }
 
     /* 03번 하단: 전 영역 환산 및 반영 판정 보드 */
@@ -292,151 +301,153 @@ st.markdown(
         flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
     }
     .audit-header {
-        font-size: 13px; font-weight: 800; color: var(--muted); margin: 0px 0 8px 2px;
+        font-size: 12.5px; font-weight: 700; color: var(--muted); margin: 0px 0 6px 2px;
         display: flex; align-items: center; justify-content: space-between;
     }
     .audit-grid {
-        flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 8px;
+        flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 6px;
     }
     .audit-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF;
-        font-size: 13.5px;
+        padding: 0 12px; border-radius: 6px; border: 1px solid var(--line); background: #FFFFFF;
+        font-size: 13px;
     }
     .audit-item.active-60 {
-        background: rgba(29, 63, 160, 0.06); border-color: rgba(29, 63, 160, 0.35);
+        border-left: 3px solid var(--navy); background: #F8FAFC;
     }
     .audit-item.active-40 {
-        background: rgba(5, 150, 105, 0.06); border-color: rgba(5, 150, 105, 0.35);
+        border-left: 3px solid #047857; background: #F8FAFC;
     }
     .audit-item.dropped {
-        background: #F8FAFE; opacity: 0.72;
+        background: #FFFFFF; opacity: 0.78;
     }
-    .audit-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .audit-subj { font-weight: 800; color: var(--navy); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .audit-raw { font-size: 11.5px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
-    .audit-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
-    .audit-conv { font-size: 14.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
-    .tag-60 { background: #1D3FA0; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
-    .tag-40 { background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2.5px 7px; border-radius: 5px; }
-    .tag-drop { background: #E6ECF5; color: #64708A; font-size: 11px; font-weight: 700; padding: 2.5px 7px; border-radius: 5px; }
+    .audit-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .audit-subj { font-weight: 750; color: var(--text); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-raw { font-size: 11px; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .audit-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .audit-conv { font-size: 13.5px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+    .tag-60 { background: var(--tint); color: var(--navy); border: 1px solid var(--line); font-size: 11px; font-weight: 700; padding: 1.5px 6px; border-radius: 4px; }
+    .tag-40 { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; font-size: 11px; font-weight: 700; padding: 1.5px 6px; border-radius: 4px; }
+    .tag-drop { background: #F1F5F9; color: #64748B; font-size: 11px; font-weight: 600; padding: 1.5px 6px; border-radius: 4px; }
 
+    /* 04번 판정 배너 (파스텔 배경 대신 화이트 카드 + 좌측 4px 상태 바) */
     .status {
-        border-radius: 12px; padding: 15px 18px; margin: 0 0 14px 0;
-        font-size: 16px; font-weight: 850; line-height: 1.55; flex-shrink: 0;
+        border: 1px solid var(--line); border-left-width: 4px;
+        border-radius: 6px; padding: 13px 16px; margin: 0 0 12px 0;
+        background: #FFFFFF !important;
+        font-size: 15px; font-weight: 800; line-height: 1.5; flex-shrink: 0;
     }
     .cmp-list {
-        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 0;
+        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; margin-top: 0;
     }
     .cmp-row {
         flex: 1; display: flex; align-items: center; justify-content: space-between;
-        padding: 0 18px; background: #F8FAFE; border: 1px solid var(--line);
-        border-radius: 12px; transition: all 0.15s ease;
+        padding: 0 14px; background: #F8FAFC; border: 1px solid var(--line);
+        border-radius: 6px;
     }
-    .cmp-row:hover { border-color: #B8C7E6; background: #F2F6FC; }
-    .cmp-lbl { font-size: 15.5px; font-weight: 750; color: var(--text); }
-    .cmp-val-group { display: flex; align-items: center; gap: 12px; }
-    .cmp-score { font-size: 18.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .cmp-lbl { font-size: 14px; font-weight: 700; color: var(--text); }
+    .cmp-val-group { display: flex; align-items: center; gap: 10px; }
+    .cmp-score { font-size: 16.5px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
     .pill-badge {
-        padding: 5px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 800;
+        padding: 3px 9px; border-radius: 4px; font-size: 12.5px; font-weight: 750;
         font-variant-numeric: tabular-nums; display: inline-flex; align-items: center;
     }
-    .pill-plus { background: rgba(29, 63, 160, 0.10); color: #1D3FA0; border: 1px solid rgba(29, 63, 160, 0.22); }
-    .pill-minus { background: rgba(225, 29, 72, 0.10); color: #E11D48; border: 1px solid rgba(225, 29, 72, 0.22); }
-    .pill-same { background: #E9EDF8; color: var(--navy); }
+    .pill-plus { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .pill-minus { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+    .pill-same { background: #F1F5F9; color: var(--text); border: 1px solid var(--line); }
 
     .empty-state {
-        text-align: center; padding: 50px 20px; background: #FFFFFF;
-        border: 2px dashed #B7C3E3; border-radius: 20px; color: var(--muted); line-height: 1.9;
+        text-align: center; padding: 44px 20px; background: #FFFFFF;
+        border: 1px solid var(--line); border-radius: 8px; color: var(--muted); line-height: 1.8;
     }
-    .empty-state strong { display: block; color: var(--navy); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .empty-state strong { display: block; color: var(--text); font-size: 17px; font-weight: 800; margin-bottom: 6px; }
 
     div[data-testid="stHorizontalBlock"] { align-items: stretch; }
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { min-width: 0; }
 
-    /* 06번 3개년 요약 카드 (05번 차트 박스와 440px 높이 완벽 일치) */
+    /* 06번 3개년 요약 카드 */
     .yr-card-list {
-        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; margin-top: 2px;
+        flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; margin-top: 2px;
     }
     .yr-card {
         flex: 1; display: flex; flex-direction: column; justify-content: center;
-        background: #F8FAFE; border: 1px solid var(--line); border-left: 4px solid var(--primary);
-        border-radius: 12px; padding: 8px 14px; transition: all 0.15s ease;
+        background: #F8FAFC; border: 1px solid var(--line);
+        border-radius: 6px; padding: 8px 14px;
     }
-    .yr-card:hover { box-shadow: 0 4px 12px rgba(8, 32, 112, 0.06); background: #FFFFFF; }
-    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
-    .yr-title { font-size: 16px; font-weight: 850; color: var(--navy); }
+    .yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 6px; }
+    .yr-title { font-size: 14.5px; font-weight: 800; color: var(--text); }
     .yr-tags { display: flex; gap: 6px; }
     .yr-tag {
-        font-size: 12.5px; font-weight: 700; padding: 2px 9px; border-radius: 6px;
+        font-size: 12px; font-weight: 600; padding: 1.5px 8px; border-radius: 4px;
         background: #FFFFFF; border: 1px solid var(--line); color: var(--muted);
     }
-    .yr-tag b { color: var(--navy); font-weight: 850; }
+    .yr-tag b { color: var(--text); font-weight: 800; }
     .yr-metrics {
         display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-        background: #FFFFFF; border: 1px solid #E6ECF7; border-radius: 8px; padding: 6px 10px; text-align: center;
+        background: #FFFFFF; border: 1px solid var(--silver); border-radius: 4px; padding: 5px 8px; text-align: center;
     }
-    .yr-m-lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 1px; }
-    .yr-m-val { font-size: 16.5px; font-weight: 850; color: var(--navy); font-variant-numeric: tabular-nums; line-height: 1.25; }
+    .yr-m-lbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 1px; }
+    .yr-m-val { font-size: 15.5px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.25; }
 
-    /* 07번 칸반 보드 & 스펙 카드 */
+    /* 07번 칸반 보드 & 스펙 카드 (안정=초록, 적정·경계=앰버, 상향=레드 시맨틱 통일) */
     .kb-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; font-weight: 850; font-size: 17px;
+        padding: 10px 14px; border-radius: 6px; margin-bottom: 8px; font-weight: 800; font-size: 15px;
+        background: #FFFFFF; border: 1px solid var(--line); border-top-width: 3px;
     }
-    .kb-safe { background: rgba(5, 150, 105, 0.10); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); }
-    .kb-fit { background: rgba(220, 38, 38, 0.10); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); }
-    .kb-up { background: rgba(29, 78, 216, 0.10); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); }
+    .kb-safe { border-top-color: #059669; color: #065F46; }
+    .kb-fit { border-top-color: #D97706; color: #92400E; }
+    .kb-up { border-top-color: #DC2626; color: #991B1B; }
     .kb-cnt {
-        background: #FFFFFF; padding: 3px 11px; border-radius: 999px; font-size: 13.5px;
-        font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        background: var(--tint); padding: 2px 8px; border-radius: 4px; font-size: 12.5px;
+        font-weight: 700; color: var(--text);
     }
     .kb-card {
-        background: #FFFFFF; border: 1px solid var(--line); border-radius: 12px;
-        padding: 14px 16px; margin-bottom: 10px; transition: all 0.15s ease;
+        background: #FFFFFF; border: 1px solid var(--line); border-radius: 6px;
+        padding: 12px 14px; margin-bottom: 8px;
     }
-    .kb-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(8, 32, 112, 0.08); transform: translateY(-1px); }
-    .kb-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
-    .kb-dept { font-size: 16.5px; font-weight: 850; color: var(--navy); }
-    .kb-quota { font-size: 12.5px; font-weight: 750; color: var(--muted); background: var(--bg); padding: 3px 9px; border-radius: 6px; flex-shrink: 0; }
+    .kb-card:hover { border-color: var(--navy); }
+    .kb-card-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+    .kb-dept { font-size: 15px; font-weight: 800; color: var(--text); }
+    .kb-quota { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--silver); padding: 1.5px 7px; border-radius: 4px; flex-shrink: 0; }
     .kb-scores {
         display: flex; align-items: center; justify-content: space-between;
-        font-size: 13.5px; color: var(--muted); background: #F8FAFE; padding: 8px 11px; border-radius: 8px; margin-bottom: 8px;
+        font-size: 12.5px; color: var(--muted); background: #F8FAFC; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px;
     }
-    .kb-scores b { color: var(--navy); font-weight: 850; font-size: 14.5px; }
-    .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 800; }
+    .kb-scores b { color: var(--text); font-weight: 800; font-size: 13px; }
+    .kb-foot { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 750; }
 
     .spec-card {
-        background: #FFFFFF; border: 1px solid var(--line); border-radius: 14px;
-        overflow: hidden; box-shadow: 0 2px 8px rgba(8, 32, 112, 0.04); margin-top: 6px; margin-bottom: 8px;
+        background: #FFFFFF; border: 1px solid var(--line); border-top: 3px solid var(--navy);
+        border-radius: 6px; overflow: hidden; margin-top: 6px; margin-bottom: 8px;
     }
     .spec-top {
-        background: linear-gradient(135deg, var(--navy-deep), var(--navy));
-        color: #FFFFFF; padding: 18px 16px; text-align: center;
+        background: #F8FAFC; border-bottom: 1px solid var(--line);
+        color: var(--text); padding: 14px 16px; text-align: center;
     }
-    .spec-dept { font-size: 18.5px; font-weight: 850; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .spec-dept { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 4px; letter-spacing: -0.3px; }
     .spec-quota {
-        display: inline-block; font-size: 13px; font-weight: 700; color: #C3CEEA;
-        background: rgba(255,255,255,0.12); padding: 3px 11px; border-radius: 999px; margin-bottom: 12px;
+        display: inline-block; font-size: 12px; font-weight: 600; color: var(--muted);
+        background: #FFFFFF; border: 1px solid var(--line); padding: 2px 9px; border-radius: 4px; margin-bottom: 8px;
     }
-    .spec-my-lbl { font-size: 12.5px; color: #C3CEEA; font-weight: 600; }
-    .spec-my-val { font-size: 28px; font-weight: 900; color: #FFFFFF; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
-    .spec-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #F8FAFE; }
-    .spec-yr-box { background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
-    .spec-yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .spec-yr-name { font-size: 15px; font-weight: 850; color: var(--navy); }
-    .bdg-safe { background: rgba(5, 150, 105, 0.12); color: #059669; border: 1px solid rgba(5, 150, 105, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
-    .bdg-fit { background: rgba(220, 38, 38, 0.12); color: #DC2626; border: 1px solid rgba(220, 38, 38, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
-    .bdg-up { background: rgba(29, 78, 216, 0.12); color: #1D4ED8; border: 1px solid rgba(29, 78, 216, 0.25); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; }
-    .bdg-none { background: #EEF1F7; color: var(--muted); padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+    .spec-my-lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .spec-my-val { font-size: 24px; font-weight: 850; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
+    .spec-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #FFFFFF; }
+    .spec-yr-box { background: #F8FAFC; border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; }
+    .spec-yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .spec-yr-name { font-size: 13.5px; font-weight: 800; color: var(--text); }
+    .bdg-safe { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 750; }
+    .bdg-fit { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 750; }
+    .bdg-up { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 750; }
+    .bdg-none { background: #F1F5F9; color: var(--muted); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
 
-    [data-testid="stAlert"] { border-radius: 10px; }
+    [data-testid="stAlert"] { border-radius: 6px; }
 
     @media (max-width: 900px) {
         .block-container { padding-top: 1.5rem; }
-        .rule-item { min-width: 100%; }
+        .rule-strip { grid-template-columns: 1fr; }
         .score-hero { padding: 16px; }
-        .section-title { font-size: 18px; }
+        .section-title { font-size: 16.5px; }
         .master-card, .master-card-056 { height: auto; }
     }
 </style>
@@ -613,7 +624,7 @@ def detect_scale(df):
 data_scale = detect_scale(db) if not db.empty else 100
 
 # ==================================================
-# 5. 계산 함수
+# 5. 계산 함수 (원본 산출 공식 100% 보존)
 # ==================================================
 def calculate_score(dept, kor, math_subj, math_val, eng_g, hist_g,
                     inq1_subj, inq1, inq2_subj, inq2):
@@ -755,7 +766,7 @@ with head_c1:
 with head_c2:
     st.markdown(
         """
-        <div class="eyebrow">ADMISSIONS COUNSELING · 2027</div>
+        <div class="eyebrow">대진대학교 입학처 공식 상담 시스템</div>
         <div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>
         """,
         unsafe_allow_html=True,
@@ -764,9 +775,9 @@ with head_c2:
 st.markdown(
     """
     <div class="rule-strip">
-        <div class="rule-item"><strong>01 &nbsp; 우수 영역 60%</strong>국어 · 수학 · 영어 중 가장 높은 영역</div>
-        <div class="rule-item"><strong>02 &nbsp; 차 순위 영역 40%</strong>60%에 반영하지 않은 국·수·영, 탐구 1과목, 한국사 중 상위 영역</div>
-        <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점</strong>미적분·기하 10% / 과학탐구 7%</div>
+        <div class="rule-item"><strong>01 &nbsp; 우수 영역 60% 반영</strong>국어 · 수학 · 영어 중 백분위(환산) 최상위 1개 영역</div>
+        <div class="rule-item"><strong>02 &nbsp; 차순위 영역 40% 반영</strong>60% 미반영 국·수·영, 탐구 상위 1과목, 한국사 중 최상위 1개 영역</div>
+        <div class="rule-item"><strong>03 &nbsp; 이공계열 가산점 부여</strong>수학(미적분·기하) 10% 가산 / 과학탐구 7% 가산</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -801,8 +812,8 @@ with st.container(border=True):
     with quota_col:
         st.markdown(
             f"""
-            <div style="font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.45;">2027 모집인원</div>
-            <div style="min-height: 44px; box-sizing: border-box; background-color: var(--tint); border-radius: 10px; padding: 8px 14px; color: var(--navy); font-weight: 850; font-size: 17px; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.45;">2027 모집인원</div>
+            <div style="min-height: 42px; box-sizing: border-box; background-color: var(--tint); border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; color: var(--navy); font-weight: 800; font-size: 16.5px; display: flex; align-items: center; justify-content: center;">
                 {escape(quota_text)}
             </div>
             """,
@@ -811,18 +822,18 @@ with st.container(border=True):
 
     with info_col:
         is_eng = selected_dept in ENG_DEPTS
-        info_bg = "rgba(29, 63, 160, 0.08)" if is_eng else "rgba(5, 150, 105, 0.08)"
-        info_border = "1px solid rgba(29, 63, 160, 0.2)" if is_eng else "1px solid rgba(5, 150, 105, 0.2)"
-        info_color = "#1D3FA0" if is_eng else "#059669"
-        info_text = "이공계열 · 수학 및 과학탐구 가산점 대상" if is_eng else "인문사회계열 · 별도 가산점 없음"
+        info_bg = "#EFF6FF" if is_eng else "#F8FAFC"
+        info_border = "1px solid #BFDBFE" if is_eng else "1px solid var(--line)"
+        info_color = "#1E40AF" if is_eng else "#475569"
+        info_text = "이공계열 · 수학(미적/기하) 10% 및 과탐 7% 가산점 적용" if is_eng else "인문사회·일반계열 · 별도 선택과목 가산점 없음"
         st.markdown(
             f"""
-            <div style="font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.45;">계열 및 가산점 안내</div>
-            <div style="min-height: 44px; box-sizing: border-box; background-color: {info_bg}; border: {info_border}; border-radius: 10px; padding: 10px 16px; color: {info_color}; font-weight: 700; font-size: 14px; display: flex; align-items: center;">
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.45;">계열 및 가산점 안내</div>
+            <div style="min-height: 42px; box-sizing: border-box; background-color: {info_bg}; border: {info_border}; border-radius: 6px; padding: 8px 14px; color: {info_color}; font-weight: 700; font-size: 13.5px; display: flex; align-items: center;">
                 {info_text}
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
 with st.container(border=True):
@@ -1029,13 +1040,13 @@ with comparison_col:
             score = result["score"]
 
             if score >= max_score:
-                msg, bg, c = "전년도 최고점 이상", "#E8F4F0", "#0B5A40"
+                msg, border_c, text_c = "[안정권] 전년도 최고점 이상 우수 성적", "#059669", "#065F46"
             elif score >= avg_score:
-                msg, bg, c = "전년도 평균점 이상", "#E9EDF8", "#082070"
+                msg, border_c, text_c = "[안정·적정권] 전년도 평균점 이상 성적", "#1D4ED8", "#1E40AF"
             elif score >= cut_score:
-                msg, bg, c = "전년도 최저점 이상 · 평균점 미만", "#FEF4E6", "#96520B"
+                msg, border_c, text_c = "[적정·경계권] 전년도 최저점 이상 · 평균점 미만", "#D97706", "#92400E"
             else:
-                msg, bg, c = "전년도 최저점 미만", "#FDEEEF", "#9F1A2C"
+                msg, border_c, text_c = "[상향지원] 전년도 최저점(커트라인) 미만", "#DC2626", "#991B1B"
 
             strip_html = '<div class="cmp-list">'
             for lbl, target in [("2026 최고점 기준", max_score), ("2026 평균점 기준", avg_score), ("2026 최저점 기준", cut_score)]:
@@ -1043,7 +1054,7 @@ with comparison_col:
                 if abs(diff) < 0.005:
                     b_cls, b_txt = "pill-same", "동일 (0.00)"
                 elif diff > 0:
-                    b_cls, b_txt = "pill-plus", f"+{diff:,.2f}점 초과"
+                    b_cls, b_txt = "pill-plus", f"+{diff:,.2f}점 여유"
                 else:
                     b_cls, b_txt = "pill-minus", f"-{abs(diff):,.2f}점 부족"
 
@@ -1055,9 +1066,8 @@ with comparison_col:
                     f'<span class="pill-badge {b_cls}">{b_txt}</span>'
                     f'</div></div>'
                 )
-            strip_html += '</div>'
+            strip_html += "</div>"
 
-            # [핵심 수정] 04번 최고점(top3-max), 평균점(top3-avg), 최저점(top3-min)에 파란색 및 초록색 컬러 타이포 적용
             st.markdown(
                 f"""
                 <div class="master-card">
@@ -1067,10 +1077,10 @@ with comparison_col:
                         <div><div class="top3-lbl">2026 평균점</div><div class="top3-val top3-avg">{display_number(avg_score)}</div></div>
                         <div><div class="top3-lbl">2026 최저점</div><div class="top3-val top3-min">{display_number(cut_score)}</div></div>
                     </div>
-                    <div class="status" style="background:{bg}; color:{c};">
+                    <div class="status" style="border-left-color:{border_c}; color:{text_c};">
                         {msg}<br>
-                        <span style="font-size:14.5px; font-weight:750;">
-                            전년도 평균 대비 {score - avg_score:+.2f}점
+                        <span style="font-size:13.5px; font-weight:700; color:var(--muted);">
+                            전년도 평균({avg_score:.2f}점) 대비 {score - avg_score:+.2f}점
                         </span>
                     </div>
                     {strip_html}
@@ -1092,13 +1102,12 @@ with comparison_col:
                 st.info("2026년 최고·평균·최저 점수 중 일부가 없어 비교 판정을 표시하지 않습니다.")
 
 # ==================================================
-# 8. 결과 출력 (05, 06번 영역: master-card-056으로 높이 440px 완벽 대칭 동기화)
+# 8. 결과 출력 (05, 06번 영역: 높이 440px 완벽 대칭 동기화)
 # ==================================================
 if not history.empty:
     chart_col, table_col = st.columns([6, 4], gap="large")
 
     with chart_col:
-        # 05번 박스: Streamlit 기본 height 옵션으로 06번(master-card-056)과 동일한 440px 고정
         with st.container(height=440, border=True):
             st.markdown(
                 '<div class="section-title sec-05-marker"><span class="step">05</span>최근 3개년 점수 분포</div>',
@@ -1134,21 +1143,20 @@ if not history.empty:
                         labelAngle=0,
                         labelFontSize=13,
                         labelFontWeight=700,
-                        labelColor="#34415E",
+                        labelColor="#0F172A",
                         ticks=False,
                         domain=False,
                         grid=True,
-                        gridColor="#EEF1F7",
+                        gridColor="#E2E8F0",
                         gridWidth=1,
                     ),
                 )
 
                 base = alt.Chart(chart_data).encode(y=y_encoding)
-
                 x_scale = alt.Scale(domain=[domain_min, domain_max], zero=False, nice=False)
 
                 range_rule = base.mark_rule(
-                    color="#CBD5E5", strokeWidth=5, strokeCap="round"
+                    color="#CBD5E1", strokeWidth=5, strokeCap="round"
                 ).encode(
                     x=alt.X(
                         "최저:Q",
@@ -1157,13 +1165,13 @@ if not history.empty:
                         axis=alt.Axis(
                             titleFontSize=12,
                             titleFontWeight=600,
-                            titleColor="#64708A",
+                            titleColor="#475569",
                             titlePadding=14,
                             labelFontSize=11,
-                            labelColor="#64708A",
+                            labelColor="#475569",
                             tickCount=6,
                             grid=True,
-                            gridColor="#E9EDF5",
+                            gridColor="#E2E8F0",
                             gridDash=[2, 3],
                             domain=False,
                             tickSize=0,
@@ -1180,7 +1188,7 @@ if not history.empty:
                 )
 
                 min_point = base.mark_point(
-                    filled=True, color="#0F9D91", size=90, stroke="#FFFFFF", strokeWidth=1.5
+                    filled=True, color="#047857", size=90, stroke="#FFFFFF", strokeWidth=1.5
                 ).encode(
                     x=alt.X("최저:Q", scale=x_scale, axis=None),
                     tooltip=[
@@ -1190,7 +1198,7 @@ if not history.empty:
                 )
 
                 max_point = base.mark_point(
-                    filled=True, color="#3157C8", size=90, stroke="#FFFFFF", strokeWidth=1.5
+                    filled=True, color="#1E40AF", size=90, stroke="#FFFFFF", strokeWidth=1.5
                 ).encode(
                     x=alt.X("최고:Q", scale=x_scale, axis=None),
                     tooltip=[
@@ -1200,7 +1208,7 @@ if not history.empty:
                 )
 
                 avg_point = base.mark_point(
-                    filled=True, color="#14264D", shape="diamond", size=145,
+                    filled=True, color="#0F172A", shape="diamond", size=145,
                     stroke="#FFFFFF", strokeWidth=1,
                 ).encode(
                     x=alt.X("평균:Q", scale=x_scale, axis=None),
@@ -1211,14 +1219,14 @@ if not history.empty:
                 )
 
                 max_txt = base.mark_text(
-                    align="left", dx=8, dy=-10, fontSize=11, color="#2447A8", fontWeight=700
+                    align="left", dx=8, dy=-10, fontSize=11, color="#1E40AF", fontWeight=700
                 ).encode(
                     x=alt.X("최고:Q", scale=x_scale, axis=None),
                     text=alt.Text("최고:Q", format=".2f"),
                 )
 
                 min_txt = base.mark_text(
-                    align="right", dx=-8, dy=10, fontSize=11, color="#087F75", fontWeight=700
+                    align="right", dx=-8, dy=10, fontSize=11, color="#047857", fontWeight=700
                 ).encode(
                     x=alt.X("최저:Q", scale=x_scale, axis=None),
                     text=alt.Text("최저:Q", format=".2f"),
@@ -1226,7 +1234,7 @@ if not history.empty:
 
                 my_score_df = pd.DataFrame({"내 점수": [float(result["score"])]})
                 my_line = alt.Chart(my_score_df).mark_rule(
-                    color="#E5485D", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
+                    color="#DC2626", strokeWidth=2, strokeDash=[5, 4], opacity=0.95
                 ).encode(
                     x=alt.X("내 점수:Q", scale=x_scale, axis=None),
                     tooltip=[alt.Tooltip("내 점수:Q", title="내 환산점수", format=".2f")],
@@ -1249,10 +1257,10 @@ if not history.empty:
 
                 st.markdown(
                     "<div style='width:100%;text-align:center;margin-top:0px;font-size:12.5px;line-height:1.4;'>"
-                    "<span style='color:#3157C8;font-weight:700;'>● 최고점</span> "
-                    "<span style='color:#087F75;font-weight:700;'>● 최저점</span> "
-                    "<span style='color:#14264D;font-weight:700;'>◆ 평균점</span> "
-                    "<span style='color:#E5485D;font-weight:700;'>┆ 내 점수</span>"
+                    "<span style='color:#1E40AF;font-weight:700;'>● 최고점</span> "
+                    "<span style='color:#047857;font-weight:700;'>● 최저점</span> "
+                    "<span style='color:#0F172A;font-weight:700;'>◆ 평균점</span> "
+                    "<span style='color:#DC2626;font-weight:700;'>┆ 내 점수</span>"
                     "</div>",
                     unsafe_allow_html=True,
                 )
@@ -1279,12 +1287,12 @@ if not history.empty:
                 f'<span class="yr-tag">추합 <b>{add_s}</b></span>'
                 f'</div></div>'
                 f'<div class="yr-metrics">'
-                f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#3157C8;">{mx_s}</div></div>'
+                f'<div><div class="yr-m-lbl">최고점</div><div class="yr-m-val" style="color:#1E40AF;">{mx_s}</div></div>'
                 f'<div><div class="yr-m-lbl">평균점</div><div class="yr-m-val">{av_s}</div></div>'
-                f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#087F75;">{mn_s}</div></div>'
+                f'<div><div class="yr-m-lbl">최저점</div><div class="yr-m-val" style="color:#047857;">{mn_s}</div></div>'
                 f'</div></div>'
             )
-        cards_html += '</div>'
+        cards_html += "</div>"
 
         st.markdown(
             f"""
@@ -1393,9 +1401,9 @@ if not db.empty and data_scale and result is not None:
         if valid_items:
             kb_cols = st.columns(3, gap="medium")
             categories = [
-                ("안정", "안정 지원권", "kb-safe", "#059669"),
-                ("적정·경계", "적정 · 경계권", "kb-fit", "#DC2626"),
-                ("상향", "상향 도전권", "kb-up", "#1D4ED8"),
+                ("안정", "안정 지원권", "kb-safe", "#047857"),
+                ("적정·경계", "적정 · 경계권", "kb-fit", "#B45309"),
+                ("상향", "상향 도전권", "kb-up", "#B91C1C"),
             ]
 
             for col, (cat_key, cat_title, head_cls, accent_color) in zip(kb_cols, categories):
@@ -1472,7 +1480,7 @@ if not db.empty and data_scale and result is not None:
                         f'<div class="spec-dept">{escape(dept_name)}</div>'
                         f'<div class="spec-quota">2027 모집인원 · {escape(item["모집인원"])}</div>'
                         f'<div class="spec-my-lbl">현재 내 환산점수</div>'
-                        f'<div class="spec-my-val">{item["현재 환산점수"]:.2f}<span style="font-size:15px; font-weight:600; color:#C3CEEA;"> 점</span></div>'
+                        f'<div class="spec-my-val">{item["현재 환산점수"]:.2f}<span style="font-size:14px; font-weight:600; color:var(--muted);"> 점</span></div>'
                         f'</div>'
                         f'<div class="spec-body">'
                     )
@@ -1500,13 +1508,18 @@ if not db.empty and data_scale and result is not None:
                             f'<span class="{b_cls}">{escape(st_txt)}</span>'
                             f'</div>'
                             f'<div class="yr-metrics">'
-                            f'<div><div class="yr-m-lbl">최고</div><div class="yr-m-val" style="color:#3157C8; font-size:16px;">{mx_v}</div></div>'
-                            f'<div><div class="yr-m-lbl">평균</div><div class="yr-m-val" style="font-size:16px;">{av_v}</div></div>'
-                            f'<div><div class="yr-m-lbl">최저</div><div class="yr-m-val" style="color:#087F75; font-size:16px;">{mn_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">최고</div><div class="yr-m-val" style="color:#1E40AF; font-size:15.5px;">{mx_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">평균</div><div class="yr-m-val" style="font-size:15.5px;">{av_v}</div></div>'
+                            f'<div><div class="yr-m-lbl">최저</div><div class="yr-m-val" style="color:#047857; font-size:15.5px;">{mn_v}</div></div>'
                             f'</div></div>'
                         )
 
-                    card_html += '</div></div>'
+                    card_html += "</div></div>"
                     st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.info("비교할 모집단위를 하나 이상 선택해 주세요.")
+
+st.caption(
+    "※ 상담 참고용 도구입니다. 최종 지원 판단은 해당 학년도 정시 모집요강과 "
+    "대학의 공식 안내를 기준으로 하세요."
+)
