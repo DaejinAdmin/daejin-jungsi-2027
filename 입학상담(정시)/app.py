@@ -752,12 +752,9 @@ def build_history(record):
 
 
 # ==================================================
-# 6. 헤더 및 입력 영역 (수직·수평 정중앙 배치)
+# 6. 헤더 및 입력 영역
 # ==================================================
-try:
-    head_c1, head_c2, head_c3 = st.columns([0.8, 8.4, 0.8], vertical_alignment="center")
-except TypeError:
-    head_c1, head_c2, head_c3 = st.columns([0.8, 8.4, 0.8])
+head_c1, head_c2 = st.columns([0.8, 9.2], vertical_alignment="center")
 
 with head_c1:
     logo_png = BASE_DIR / "logo.png"
@@ -769,7 +766,9 @@ with head_c1:
 
 with head_c2:
     st.markdown(
-        '<div class="page-title">2027학년도 대진대학교 정시 입학상담 솔루션</div>',
+        '<div class="page-title" style="text-align: left; display: flex; align-items: center; min-height: 92px; margin: 0;">'
+        '2027학년도 대진대학교 정시 입학상담 솔루션'
+        '</div>',
         unsafe_allow_html=True,
     )
 
